@@ -39,7 +39,7 @@ const daftar = () => {
             email,
             password,
             username,
-            password_confirm: confirmPassword
+            confirm_password: confirmPassword
         };
 
         // Validate confirm password
@@ -57,7 +57,7 @@ const daftar = () => {
                 // Sign-up failed, display an error message
                 setError('An error occurred during sign-up');
             }
-            console.log(response.data);
+            // console.log(response.data);
         } catch (error) {
             console.error(error.response);
             if (error.response && error.response.data && error.response.data.message) {
