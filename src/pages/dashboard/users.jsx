@@ -5,7 +5,9 @@ import { UserPlusIcon, TrashIcon, PencilSquareIcon } from "@heroicons/react/24/s
 
 import {
   Typography,
-  Button
+  Button,
+  CardFooter,
+  IconButton
 } from "@material-tailwind/react";
 
 // layout for page
@@ -32,12 +34,12 @@ export default function UsersTable({ color }) {
                   <div className="mb-8 flex items-center justify-between gap-8">
                     <div>
                       <Typography variant="h5" color="blue-gray">
-                        User Lists
+                        Users List
                       </Typography>
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
                       <Button className="flex items-center gap-3" size="sm">
-                        <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add member
+                        <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add user
                       </Button>
                     </div>
                   </div>
@@ -164,6 +166,37 @@ export default function UsersTable({ color }) {
                     </tbody>
                   </table>
 
+                  <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
+                    <Button variant="outlined" size="sm">
+                      Previous
+                    </Button>
+                    <div className="flex items-center gap-2">
+                      <IconButton variant="outlined" size="sm">
+                        1
+                      </IconButton>
+                      <IconButton variant="text" size="sm">
+                        2
+                      </IconButton>
+                      <IconButton variant="text" size="sm">
+                        3
+                      </IconButton>
+                      <IconButton variant="text" size="sm">
+                        ...
+                      </IconButton>
+                      <IconButton variant="text" size="sm">
+                        8
+                      </IconButton>
+                      <IconButton variant="text" size="sm">
+                        9
+                      </IconButton>
+                      <IconButton variant="text" size="sm">
+                        10
+                      </IconButton>
+                    </div>
+                    <Button variant="outlined" size="sm">
+                      Next
+                    </Button>
+                  </CardFooter>
 
                 </div>
               </div>
