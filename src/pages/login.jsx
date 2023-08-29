@@ -16,33 +16,40 @@ import axios from 'axios';
 
 const masuk = () => {
     const [password, setPassword] = useState('');
-    const [username, setUsername] = useState('');
+    const [usernameOrEmail, setUsernameOrEmail] = useState(''); // Change this line
     const [passwordError, setPasswordError] = useState('');
-    const [usernameError, setUsernameError] = useState(false);
+    const [usernameOrEmailError, setUsernameOrEmailError] = useState(false); // Change this line
     const [error, setError] = useState('');
+    const [rememberMe, setRememberMe] = useState(false);
     const router = useRouter(); // Initialize the router instance
 
     const submit = async (e) => {
         e.preventDefault();
-        setUsernameError(false);
+        setUsernameOrEmailError(false); // Change this line
         setPasswordError('');
         setError('');
 
+        const emailRegex = /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/;
+
+        const isEmail = emailRegex.test(usernameOrEmail);
+
         try {
-            const { data } = await axios.post('http://localhost:5000/api/login', {
-                username,
+            const { data } = await axios.post('http://localhost:8000/api/login', {
+                email: isEmail ? usernameOrEmail : undefined,
+                username: isEmail ? undefined : usernameOrEmail,
                 password,
+                rememberMe
             }, { withCredentials: true });
-            axios.defaults.headers.common['Authorization'] = `Bearer ${data.accessToken}`;
-            axios.defaults.headers.common['Refresh-Token'] = `Bearer ${data.refreshToken}`;
             if (data) {
                 // Redirect to the login page
-                router.push('/');
+                // router.push('/dashboard');
+                console.log(data);
             } else {
                 // Sign-in failed, display an error message
                 setError('An error occurred during sign-in');
             }
-            console.log(data);
+
+
         } catch (error) {
             console.error(error.response);
             if (error.response && error.response.data && error.response.data.message) {
@@ -50,8 +57,8 @@ const masuk = () => {
                 setError(errorMessage);
 
                 // Set error flags based on the error message
-                if (errorMessage.includes('Username')) {
-                    setUsernameError(errorMessage);
+                if (errorMessage.includes('Username or Email')) {
+                    setUsernameOrEmailError(errorMessage);
                 }
                 if (errorMessage.includes('Password')) {
                     setPasswordError(errorMessage);
@@ -97,12 +104,13 @@ const masuk = () => {
                                 <div className='mb-5'>
                                     <Input
                                         size="lg"
-                                        label="Username"
+                                        label="Email or Username"
+                                        type="text"
                                         required
-                                        error={!!usernameError} // Pass the error state as a prop
-                                        onChange={(e) => setUsername(e.target.value)}
+                                        error={!!usernameOrEmailError} // Change this line
+                                        onChange={(e) => setUsernameOrEmail(e.target.value)} // Change this line
                                     />
-                                    {/* {usernameError && <div className="text-red-500 text-xs mt-1">{usernameError}</div>} */}
+                                    {usernameOrEmailError && <div className="text-red-500 text-xs mt-1">{usernameOrEmailError}</div>}
                                 </div>
                                 <div className='mb-5'>
                                     <Input
@@ -113,7 +121,7 @@ const masuk = () => {
                                         error={!!passwordError} // Pass the error state as a prop
                                         onChange={(e) => validatePassword(e.target.value)}
                                     />
-                                    {/* {passwordError && <div className="text-red-500 text-xs mt-1">{passwordError}</div>} */}
+                                    {passwordError && <div className="text-red-500 text-xs mt-1">{passwordError}</div>}
                                 </div>
                             </div>
                             <Checkbox
@@ -124,14 +132,10 @@ const masuk = () => {
                                         className="flex items-center font-normal"
                                     >
                                         Remember Me
-                                        <a
-                                            href="#"
-                                            className="font-medium transition-colors hover:text-gray-900"
-                                        >
-                                        </a>
                                     </Typography>
                                 }
                                 containerProps={{ className: "-ml-2.5" }}
+                                onChange={(e) => setRememberMe(e.target.checked)} // Add this line to capture the checkbox state
                             />
                             <Button className="mt-6" fullWidth type='submit'>
                                 Login
