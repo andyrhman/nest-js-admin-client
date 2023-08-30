@@ -2,12 +2,11 @@ import React, { useEffect, useState } from "react";
 import UserDropdown from "@/components/Dropdowns/UserDropdown.js";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { User } from "@/models/user";
 
 const Navbar = () => {
   // Getting the user data
-  const [user, setUser] = useState('');
-  // Redirect if user not authenticated
-  const router = useRouter();
+  const [user, setUser] = useState(new User());
 
   const [error, setError] = useState('');
   useEffect(() => {
@@ -16,7 +15,11 @@ const Navbar = () => {
       async () => {
         try {
           const { data } = await axios.get('user');
-          setUser(data);
+          setUser(new User(
+            data.id,
+            data.username,
+            data.email
+          ));
         } catch (error) {
           if (error.response && error.response.status === 401) {
             setError('Authentication Error');
@@ -52,7 +55,7 @@ const Navbar = () => {
               href="#pablo"
               onClick={(e) => e.preventDefault()}
             >
-              {user.username}
+              {user.user_email}
             </a>
             <UserDropdown />
           </ul>
