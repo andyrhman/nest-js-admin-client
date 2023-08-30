@@ -39,7 +39,7 @@ const masuk = () => {
                 username: isEmail ? undefined : usernameOrEmail,
                 password,
                 rememberMe
-            }, { withCredentials: true });
+            });
             if (data) {
                 // Redirect to the login page
                 router.push('/dashboard');

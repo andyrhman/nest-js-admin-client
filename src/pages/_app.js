@@ -4,6 +4,10 @@ import '@/styles/globals.css'; // Your global CSS file
 import { ToastContainer } from 'react-toastify';
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import 'react-toastify/dist/ReactToastify.css';
+import axios from 'axios';
+
+axios.defaults.baseURL = 'http://localhost:8000/api/';
+axios.defaults.withCredentials = true;
 
 function MyApp({ Component, pageProps }) {
     return (

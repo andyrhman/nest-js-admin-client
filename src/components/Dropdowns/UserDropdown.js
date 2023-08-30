@@ -1,11 +1,19 @@
 import React, { Fragment } from "react";
 import { Menu, Transition } from '@headlessui/react';
+import { useRouter } from "next/router";
+import axios from "axios";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(' ');
 }
 
 const UserDropdown = () => {
+  const router = useRouter();
+  // Logout
+  const logout = async () => {
+    await axios.post('logout', {});
+    router.push('/login');
+  }
 
   return (
     <>
@@ -56,6 +64,7 @@ const UserDropdown = () => {
               {({ active }) => (
                 <a
                   href="#"
+                  onClick={logout}
                   className={classNames(active ? 'bg-gray-100' : '', 'block px-4 py-2 text-sm text-gray-700')}
                 >
                   Sign out

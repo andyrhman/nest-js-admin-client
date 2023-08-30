@@ -1,17 +1,25 @@
 import React, { useEffect, useState } from "react";
-import http from "@/services/Api";
-
 import UserDropdown from "@/components/Dropdowns/UserDropdown.js";
+import { useRouter } from "next/router";
+import axios from "axios";
 
 const Navbar = () => {
+  // Getting the user data
   const [user, setUser] = useState('');
+  // Redirect if user not authenticated
+  const router = useRouter();
 
   useEffect(() => {
 
     (
       async () => {
-        const { data } = await http.get('/user', { withCredentials: true });
-        setUser(data);
+        try {
+          const { data } = await axios.get('user');
+          setUser(data);
+        } catch (error) {
+          router.push('/login');
+        }
+
       }
     )();
 
