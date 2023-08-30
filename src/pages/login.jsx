@@ -42,8 +42,7 @@ const masuk = () => {
             }, { withCredentials: true });
             if (data) {
                 // Redirect to the login page
-                // router.push('/dashboard');
-                console.log(data);
+                router.push('/dashboard');
             } else {
                 // Sign-in failed, display an error message
                 setError('An error occurred during sign-in');
