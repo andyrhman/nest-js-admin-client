@@ -9,6 +9,7 @@ const Navbar = () => {
   // Redirect if user not authenticated
   const router = useRouter();
 
+  const [error, setError] = useState('');
   useEffect(() => {
 
     (
@@ -17,9 +18,14 @@ const Navbar = () => {
           const { data } = await axios.get('user');
           setUser(data);
         } catch (error) {
-          router.push('/login');
+          if (error.response && error.response.status === 401) {
+            setError('Authentication Error');
+            // Handle authentication error here
+          } else {
+            setError('An error occurred');
+            console.log(error);
+          }
         }
-
       }
     )();
 
@@ -28,7 +34,6 @@ const Navbar = () => {
 
   return (
     <>
-      {/* Navbar */}
       <nav className="absolute top-0 left-0 w-full z-10 bg-transparent md:flex-row md:flex-nowrap md:justify-start flex items-center p-4">
         <div className="w-full mx-autp items-center flex justify-between md:flex-nowrap flex-wrap md:px-10 px-4">
           {/* Brand */}
@@ -53,7 +58,6 @@ const Navbar = () => {
           </ul>
         </div>
       </nav>
-      {/* End Navbar */}
     </>
   );
 }
