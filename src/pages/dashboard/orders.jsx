@@ -10,7 +10,8 @@ import {
   Typography,
   Button,
   CardFooter,
-  IconButton
+  IconButton,
+  Spinner
 } from "@material-tailwind/react";
 
 // layout for page
@@ -245,24 +246,15 @@ export default function OrdersTable({ color }) {
             <FooterAdmin />
           </>
         ) : (
-          <div className="relative my-44">
-            <div className="flex justify-center mb-6">
-              <Typography variant="h5" color="blue-gray" className="text-center">
-                Please Sign-in first if you want to access this page.
-              </Typography>
-            </div>
-
-            <div className="flex justify-center">
-              <div className="flex items-center gap-4">
-                <Link href={'/login'}>
-                  <Button color="blue">Sign-in</Button>
-                </Link>
-                <Link href={'/register'}>
-                  <Button color="green">Sign-up</Button>
-                </Link>
+          <>
+            {error && (
+              <div className="relative my-44">
+                <div className="flex justify-center mb-6">
+                  <Spinner color="purple" className="h-16 w-16 text-gray-900/50" />
+                </div>
               </div>
-            </div>
-          </div>
+            )}
+          </>
         )}
 
 
