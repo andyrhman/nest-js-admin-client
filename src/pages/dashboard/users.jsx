@@ -166,8 +166,16 @@ export default function UsersTable({ color }) {
                                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                   {user.email}
                                 </td>
-                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  <i className="fas fa-circle text-green-500 mr-2"></i> {user.role.name}
+                                <td
+                                  className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
+                                      ? "text-purple-500"
+                                      : user.role.name === "Moderator"
+                                        ? "text-blue-500"
+                                        : "text-green-500"
+                                    }`}
+                                >
+                                  <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
+                                  {user.role.name}
                                 </td>
                                 <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
 
