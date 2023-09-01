@@ -29,13 +29,20 @@ export default function UsersTable({ color }) {
   const [error, setError] = useState('');
 
   const router = useRouter();
+
+  const [page, setPage] = useState(1);
+  const [lastPage, setLastPage] = useState(0);
+
   useEffect(() => {
 
     (
       async () => {
         try {
-          const { data } = await axios.get('users');
+          const { data } = await axios.get(`users?page=${page}`);
+
           setUsers(data.data);
+          setLastPage(data.meta.last_page);
+
         } catch (error) {
           if (error.response && error.response.status === 401) {
             setError('Authentication Error');
@@ -67,7 +74,76 @@ export default function UsersTable({ color }) {
     )();
 
 
-  }, [])
+  }, [page]);
+
+  const handlePageClick = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= lastPage) {
+      setPage(pageNumber);
+    }
+  };
+
+  const renderPagination = () => {
+    const pages = [];
+
+    for (let i = 1; i <= lastPage; i++) {
+      if (
+        i === 1 || // Always show the first page
+        i === lastPage || // Always show the last page
+        (i >= page - 1 && i <= page + 1) // Show the current page and the two adjacent pages
+      ) {
+        pages.push(
+          <button
+            key={i}
+            className={`${i === page ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'
+              } px-3 py-1 border`}
+            onClick={() => handlePageClick(i)}
+          >
+            {i}
+          </button>
+        );
+      } else if (i === page - 2 || i === page + 2) {
+        // Show ellipsis for skipped pages
+        pages.push(
+          <span key={i} className="text-gray-500">
+            ...
+          </span>
+        );
+      }
+    }
+
+    return (
+      <div className="flex gap-2">
+        <button
+          className="bg-blue-500 text-white px-3 py-1 border"
+          onClick={prev}
+          disabled={page === 1}
+        >
+          Prev
+        </button>
+        {pages}
+        <button
+          className="bg-blue-500 text-white px-3 py-1 border"
+          onClick={next}
+          disabled={page === lastPage}
+        >
+          Next
+        </button>
+      </div>
+    );
+  };
+
+  const next = () => {
+    if (page < lastPage) {
+      setPage(page + 1);
+    }
+  };
+
+  const prev = () => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
+
   return (
     <Layout>
       <>
@@ -168,10 +244,10 @@ export default function UsersTable({ color }) {
                                 </td>
                                 <td
                                   className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
-                                      ? "text-purple-500"
-                                      : user.role.name === "Moderator"
-                                        ? "text-blue-500"
-                                        : "text-green-500"
+                                    ? "text-purple-500"
+                                    : user.role.name === "Moderator"
+                                      ? "text-blue-500"
+                                      : "text-green-500"
                                     }`}
                                 >
                                   <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
@@ -195,33 +271,11 @@ export default function UsersTable({ color }) {
                         </table>
 
                         <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-                          <Button variant="outlined" size="sm">
+                          <Button variant="outlined" size="sm" onClick={prev}>
                             Previous
                           </Button>
-                          <div className="flex items-center gap-2">
-                            <IconButton variant="outlined" size="sm">
-                              1
-                            </IconButton>
-                            <IconButton variant="text" size="sm">
-                              2
-                            </IconButton>
-                            <IconButton variant="text" size="sm">
-                              3
-                            </IconButton>
-                            <IconButton variant="text" size="sm">
-                              ...
-                            </IconButton>
-                            <IconButton variant="text" size="sm">
-                              8
-                            </IconButton>
-                            <IconButton variant="text" size="sm">
-                              9
-                            </IconButton>
-                            <IconButton variant="text" size="sm">
-                              10
-                            </IconButton>
-                          </div>
-                          <Button variant="outlined" size="sm">
+
+                          <Button variant="outlined" size="sm" onClick={next}>
                             Next
                           </Button>
                         </CardFooter>
