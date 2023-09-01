@@ -92,14 +92,14 @@ export default function UsersTable({ color }) {
         (i >= page - 1 && i <= page + 1) // Show the current page and the two adjacent pages
       ) {
         pages.push(
-          <button
+          <IconButton
             key={i}
-            className={`${i === page ? 'bg-blue-500 text-white' : 'bg-white text-blue-500'
-              } px-3 py-1 border`}
+            size="sm"
             onClick={() => handlePageClick(i)}
+            variant={i === page ? "outlined" : "text"}
           >
             {i}
-          </button>
+          </IconButton>
         );
       } else if (i === page - 2 || i === page + 2) {
         // Show ellipsis for skipped pages
@@ -112,25 +112,30 @@ export default function UsersTable({ color }) {
     }
 
     return (
-      <div className="flex gap-2">
-        <button
-          className="bg-blue-500 text-white px-3 py-1 border"
+      <>
+        <Button
+          variant="outlined"
+          size="sm"
           onClick={prev}
           disabled={page === 1}
         >
-          Prev
-        </button>
-        {pages}
-        <button
-          className="bg-blue-500 text-white px-3 py-1 border"
+          Previous
+        </Button>
+        <div className="flex items-center gap-2">
+          {pages}
+        </div>
+        <Button
+          variant="outlined"
+          size="sm"
           onClick={next}
           disabled={page === lastPage}
         >
           Next
-        </button>
-      </div>
+        </Button>
+      </>
     );
   };
+
 
   const next = () => {
     if (page < lastPage) {
@@ -271,13 +276,7 @@ export default function UsersTable({ color }) {
                         </table>
 
                         <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-                          <Button variant="outlined" size="sm" onClick={prev}>
-                            Previous
-                          </Button>
-
-                          <Button variant="outlined" size="sm" onClick={next}>
-                            Next
-                          </Button>
+                          {renderPagination()}
                         </CardFooter>
 
                       </div>
