@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
-import Link from "next/link";
 
 // components
 import { UserPlusIcon, TrashIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
@@ -25,7 +24,7 @@ import Layout from "@/components/Layout";
 
 export default function UsersTable({ color }) {
   // Getting the user data
-  const [user, setUser] = useState('');
+  const [users, setUsers] = useState([]);
 
   const [error, setError] = useState('');
 
@@ -36,7 +35,7 @@ export default function UsersTable({ color }) {
       async () => {
         try {
           const { data } = await axios.get('users');
-          setUser(data.data);
+          setUsers(data.data);
         } catch (error) {
           if (error.response && error.response.status === 401) {
             setError('Authentication Error');
@@ -72,7 +71,7 @@ export default function UsersTable({ color }) {
   return (
     <Layout>
       <>
-        {user ? (
+        {users ? (
           <>
             <Sidebar />
             <div className="relative md:ml-64 bg-blueGray-100">
@@ -110,7 +109,7 @@ export default function UsersTable({ color }) {
                                     : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
                                 }
                               >
-                                Project
+                                Name
                               </th>
                               <th
                                 className={
@@ -120,7 +119,7 @@ export default function UsersTable({ color }) {
                                     : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
                                 }
                               >
-                                Budget
+                                Username
                               </th>
                               <th
                                 className={
@@ -130,7 +129,7 @@ export default function UsersTable({ color }) {
                                     : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
                                 }
                               >
-                                Status
+                                Email
                               </th>
                               <th
                                 className={
@@ -140,7 +139,7 @@ export default function UsersTable({ color }) {
                                     : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
                                 }
                               >
-                                Users
+                                Role
                               </th>
                               <th
                                 className={
@@ -156,66 +155,34 @@ export default function UsersTable({ color }) {
                             </tr>
                           </thead>
                           <tbody>
-                            <tr>
-                              <th className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left flex items-center">
-                                <img
-                                  src="/img/bootstrap.jpg"
-                                  className="h-12 w-12 bg-white rounded-full border"
-                                  alt="..."
-                                ></img>{" "}
-                                <span
-                                  className={
-                                    "ml-3 font-bold " +
-                                    +(color === "light" ? "text-blueGray-600" : "text-white")
-                                  }
-                                >
-                                  Argon Design System
-                                </span>
-                              </th>
-                              <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                $2,500 USD
-                              </td>
-                              <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                <i className="fas fa-circle text-orange-500 mr-2"></i> pending
-                              </td>
-                              <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                <div className="flex">
-                                  <img
-                                    src="/img/team-1-800x800.jpg"
-                                    alt="..."
-                                    className="w-10 h-10 rounded-full border-2 border-blueGray-50 shadow"
-                                  ></img>
-                                  <img
-                                    src="/img/team-2-800x800.jpg"
-                                    alt="..."
-                                    className="w-10 h-10 rounded-full border-2 border-blueGray-50 shadow -ml-4"
-                                  ></img>
-                                  <img
-                                    src="/img/team-3-800x800.jpg"
-                                    alt="..."
-                                    className="w-10 h-10 rounded-full border-2 border-blueGray-50 shadow -ml-4"
-                                  ></img>
-                                  <img
-                                    src="/img/team-4-470x470.png"
-                                    alt="..."
-                                    className="w-10 h-10 rounded-full border-2 border-blueGray-50 shadow -ml-4"
-                                  ></img>
-                                </div>
-                              </td>
-                              <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            {users.map((user) =>
+                              <tr key={user.id}>
+                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  {user.username}
+                                </td>
+                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  {user.username}
+                                </td>
+                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  {user.email}
+                                </td>
+                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  <i className="fas fa-circle text-green-500 mr-2"></i> {user.role.name}
+                                </td>
+                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
 
-                                <Button color="blue" className="items-center gap-3">
-                                  <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
-                                </Button>
+                                  <Button color="blue" className="items-center gap-3">
+                                    <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
+                                  </Button>
 
-                                <Button color="red" className="items-center gap-3">
-                                  <TrashIcon strokeWidth={2} className="h-4 w-4" />
-                                </Button>
+                                  <Button color="red" className="items-center gap-3">
+                                    <TrashIcon strokeWidth={2} className="h-4 w-4" />
+                                  </Button>
 
-                              </td>
+                                </td>
 
-                            </tr>
-
+                              </tr>
+                            )}
                           </tbody>
                         </table>
 
