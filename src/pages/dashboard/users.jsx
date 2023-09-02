@@ -1,16 +1,19 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import axios from "axios";
+import { User } from "@/models/user";
+import authenticationService from "@/services/AuthenticationService";
 
 // components
-import { UserPlusIcon, TrashIcon, PencilSquareIcon } from "@heroicons/react/24/solid";
+import { UserPlusIcon, TrashIcon, PencilSquareIcon, MagnifyingGlassIcon } from "@heroicons/react/24/solid";
 
 import {
   Typography,
   Button,
   CardFooter,
   IconButton,
-  Spinner
+  Spinner,
+  Input
 } from "@material-tailwind/react";
 
 // layout for page
@@ -25,32 +28,38 @@ import Layout from "@/components/Layout";
 export default function UsersTable({ color }) {
   // Getting the user data
   const [users, setUsers] = useState([]);
+  const [Datauser, setUser] = useState(new User());
+  const [searchResults, setSearchResults] = useState([]); // Step 1: Create a state variable for search results
 
   const [error, setError] = useState('');
 
   const router = useRouter();
 
   const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(0);
+  const [lastPage, setLastPage] = useState(0);
 
   useEffect(() => {
 
     (
       async () => {
         try {
-          const { data } = await axios.get(`users?page=${page}`);
+          const {data: userData} = await axios.get('user');
+          setUser(new User(
+            userData.id,
+            userData.username,
+            userData.email
+          ));
+
+          const { data: data } = await axios.get(`users?page=${page}`);
 
           setUsers(data.data);
-          setTotalPages(data.meta.last_page);
+          setLastPage(data.meta.last_page);
 
         } catch (error) {
           if (error.response && error.response.status === 401) {
             setError('Authentication Error');
 
-            // Set up a timer to redirect after 5 seconds
-            setTimeout(() => {
-              router.push('/login');
-            }, 5000); // 5000 milliseconds = 5 seconds
+            router.push('/login');
 
           } else {
             setError('An error occurred');
@@ -60,10 +69,7 @@ export default function UsersTable({ color }) {
           if (error.response && error.response.status === 403) {
             setError('Authentication Error');
 
-            // Set up a timer to redirect after 5 seconds
-            setTimeout(() => {
-              router.push('/dashboard');
-            }, 5000); // 5000 milliseconds = 5 seconds
+            router.push('/dashboard');
 
           } else {
             setError('An error occurred');
@@ -76,23 +82,136 @@ export default function UsersTable({ color }) {
 
   }, [page]);
 
-  let pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const handlePageClick = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= lastPage) {
+      setPage(pageNumber);
+    }
+  };
+
+  const renderPagination = () => {
+    const pages = [];
+
+    const [inputPage, setInputPage] = useState('');
+    const [isInputActive, setInputActive] = useState(false);
+    const [ellipsisClicked, setEllipsisClicked] = useState(false);
+
+    const handleInputPageChange = (e) => {
+      setInputPage(e.target.value);
+    };
+
+    const handleInputPageKeyPress = (e) => {
+      if (e.key === "Enter") {
+        const pageNumber = parseInt(inputPage);
+        if (pageNumber >= 1 && pageNumber <= lastPage) {
+          handlePageClick(pageNumber);
+        }
+        setInputPage('');
+        setInputActive(false);
+      }
+    };
+
+    for (let i = 1; i <= lastPage; i++) {
+      if (i === 1 || i === lastPage || (i >= page - 1 && i <= page + 1)) {
+        pages.push(
+          <IconButton
+            key={i}
+            size="sm"
+            onClick={() => handlePageClick(i)}
+            variant={i === page ? "outlined" : "text"}
+          >
+            {i}
+          </IconButton>
+        );
+      } else if (i === page - 2 || i === page + 2) {
+        // Show ellipsis for skipped pages, or input if clicked
+        pages.push(
+          <div key={i}>
+            {ellipsisClicked ? (
+              <input
+                type="number"
+                value={inputPage}
+                onChange={handleInputPageChange}
+                onKeyUp={handleInputPageKeyPress}
+                className="border rounded-md p-1 w-10 text-center"
+                placeholder="..."
+                min="1" // Set the minimum value to 1
+              />
+            ) : (
+              <span
+                className="text-gray-500 cursor-pointer"
+                onClick={() => setEllipsisClicked(true)}
+              >
+                ...
+              </span>
+            )}
+          </div>
+        );
+      }
+    }
+
+    return (
+      <>
+        <Button
+          variant="outlined"
+          size="sm"
+          onClick={prev}
+          disabled={page === 1}
+        >
+          Previous
+        </Button>
+        <div className="flex items-center gap-2">
+          {pages}
+        </div>
+        <Button
+          variant="outlined"
+          size="sm"
+          onClick={next}
+          disabled={page === lastPage}
+        >
+          Next
+        </Button>
+      </>
+    );
+  };
 
   const next = () => {
-    setPage(page + 1);
-  }
+    if (page < lastPage) {
+      setPage(page + 1);
+    }
+  };
 
   const prev = () => {
-    setPage(page - 1);
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  };
+
+  const del = async (id) => {
+    if (window.confirm("Delete this user?")) {
+      await axios.delete(`users/${id}`);
+
+      setUsers(users.filter((u) => u.id !== id));
+
+      window.location.reload();
+    }
+  }
+
+  const findUser = async (value) => {
+    try {
+      const { data } = await authenticationService.findByTitle(value);
+      setSearchResults(data); // Step 2: Set search results in state variable
+    } catch (error) {
+      if (error.response && error.response.status === 404) {
+        console.log(error);
+        setSearchResults([]); // Clear search results if no data is found
+      }
+    }
   }
 
   return (
     <Layout>
       <>
-        {users ? (
+        {Datauser ? (
           <>
             <Sidebar />
             <div className="relative md:ml-64 bg-blueGray-100">
@@ -111,6 +230,13 @@ export default function UsersTable({ color }) {
                             </Typography>
                           </div>
                           <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+                            <div className="w-full md:w-72">
+                              <Input
+                                label="Search"
+                                icon={<MagnifyingGlassIcon className="h-5 w-5" />}
+                                onChange={(e) => findUser(e.target.value)}
+                              />
+                            </div>
                             <Button className="flex items-center gap-3" size="sm">
                               <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add user
                             </Button>
@@ -176,64 +302,88 @@ export default function UsersTable({ color }) {
                             </tr>
                           </thead>
                           <tbody>
-                            {users.map((user) =>
-                              <tr key={user.id}>
-                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  {user.username}
-                                </td>
-                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  {user.username}
-                                </td>
-                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                  {user.email}
-                                </td>
-                                <td
-                                  className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
-                                    ? "text-purple-500"
-                                    : user.role.name === "Moderator"
-                                      ? "text-blue-500"
-                                      : "text-green-500"
-                                    }`}
-                                >
-                                  <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
-                                  {user.role.name}
-                                </td>
-                                <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                            {searchResults.length > 0 ? ( // Step 3: Display search results when available
+                              searchResults.map((user) => (
+                                <tr key={user.id}>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    {user.username}
+                                  </td>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    {user.username}
+                                  </td>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    {user.email}
+                                  </td>
+                                  <td
+                                    className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
+                                      ? "text-purple-500"
+                                      : user.role.name === "Moderator"
+                                        ? "text-blue-500"
+                                        : "text-green-500"
+                                      }`}
+                                  >
+                                    <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
+                                    {user.role.name}
+                                  </td>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
 
-                                  <Button color="blue" className="items-center gap-3">
-                                    <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
-                                  </Button>
+                                    <Button color="blue" className="items-center gap-3">
+                                      <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
+                                    </Button>
 
-                                  <Button color="red" className="items-center gap-3">
-                                    <TrashIcon strokeWidth={2} className="h-4 w-4" />
-                                  </Button>
+                                    <Button color="red" className="items-center gap-3" onClick={() => del(user.id)}>
+                                      <TrashIcon strokeWidth={2} className="h-4 w-4" />
+                                    </Button>
 
-                                </td>
+                                  </td>
 
-                              </tr>
+                                </tr>
+                              ))
+                            ) : (
+                              // Display regular users list when there are no search results
+                              users.map((user) => (
+                                <tr key={user.id}>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    {user.username}
+                                  </td>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    {user.username}
+                                  </td>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                    {user.email}
+                                  </td>
+                                  <td
+                                    className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
+                                      ? "text-purple-500"
+                                      : user.role.name === "Moderator"
+                                        ? "text-blue-500"
+                                        : "text-green-500"
+                                      }`}
+                                  >
+                                    <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
+                                    {user.role.name}
+                                  </td>
+                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+
+                                    <Button color="blue" className="items-center gap-3">
+                                      <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
+                                    </Button>
+
+                                    <Button color="red" className="items-center gap-3" onClick={() => del(user.id)}>
+                                      <TrashIcon strokeWidth={2} className="h-4 w-4" />
+                                    </Button>
+
+                                  </td>
+
+                                </tr>
+                              ))
                             )}
+
                           </tbody>
                         </table>
 
                         <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-                          <Button variant="outlined" size="sm" onClick={prev}>
-                            Previous
-                          </Button>
-                          <div className="flex items-center gap-2">
-                            {pageNumbers.map((number) => (
-                              page === number ?
-                                <IconButton variant="outlined" size="sm" onClick={() => setPage(number)}>
-                                  {number}
-                                </IconButton>
-                                :
-                                <IconButton variant="text" size="sm" onClick={() => setPage(number)}>
-                                  {number}
-                                </IconButton>
-                            ))}
-                          </div>
-                          <Button variant="outlined" size="sm" onClick={next}>
-                            Next
-                          </Button>
+                          {renderPagination()}
                         </CardFooter>
 
                       </div>
