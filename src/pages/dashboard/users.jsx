@@ -30,6 +30,7 @@ export default function UsersTable({ color }) {
   const [users, setUsers] = useState([]);
   const [Datauser, setUser] = useState(new User());
   const [searchResults, setSearchResults] = useState([]); // Step 1: Create a state variable for search results
+  const [searchValue, setSearchValue] = useState("");
 
   const [error, setError] = useState('');
 
@@ -43,7 +44,7 @@ export default function UsersTable({ color }) {
     (
       async () => {
         try {
-          const {data: userData} = await axios.get('user');
+          const { data: userData } = await axios.get('user');
           setUser(new User(
             userData.id,
             userData.username,
@@ -55,6 +56,9 @@ export default function UsersTable({ color }) {
           setUsers(data.data);
           setLastPage(data.meta.last_page);
 
+          if (searchResults.length > 0 && page !== 1) {
+            findUser(searchValue, page);
+          }
         } catch (error) {
           if (error.response && error.response.status === 401) {
             setError('Authentication Error');
@@ -82,98 +86,6 @@ export default function UsersTable({ color }) {
 
   }, [page]);
 
-  const handlePageClick = (pageNumber) => {
-    if (pageNumber >= 1 && pageNumber <= lastPage) {
-      setPage(pageNumber);
-    }
-  };
-
-  const renderPagination = () => {
-    const pages = [];
-
-    const [inputPage, setInputPage] = useState('');
-    const [isInputActive, setInputActive] = useState(false);
-    const [ellipsisClicked, setEllipsisClicked] = useState(false);
-
-    const handleInputPageChange = (e) => {
-      setInputPage(e.target.value);
-    };
-
-    const handleInputPageKeyPress = (e) => {
-      if (e.key === "Enter") {
-        const pageNumber = parseInt(inputPage);
-        if (pageNumber >= 1 && pageNumber <= lastPage) {
-          handlePageClick(pageNumber);
-        }
-        setInputPage('');
-        setInputActive(false);
-      }
-    };
-
-    for (let i = 1; i <= lastPage; i++) {
-      if (i === 1 || i === lastPage || (i >= page - 1 && i <= page + 1)) {
-        pages.push(
-          <IconButton
-            key={i}
-            size="sm"
-            onClick={() => handlePageClick(i)}
-            variant={i === page ? "outlined" : "text"}
-          >
-            {i}
-          </IconButton>
-        );
-      } else if (i === page - 2 || i === page + 2) {
-        // Show ellipsis for skipped pages, or input if clicked
-        pages.push(
-          <div key={i}>
-            {ellipsisClicked ? (
-              <input
-                type="number"
-                value={inputPage}
-                onChange={handleInputPageChange}
-                onKeyUp={handleInputPageKeyPress}
-                className="border rounded-md p-1 w-10 text-center"
-                placeholder="..."
-                min="1" // Set the minimum value to 1
-              />
-            ) : (
-              <span
-                className="text-gray-500 cursor-pointer"
-                onClick={() => setEllipsisClicked(true)}
-              >
-                ...
-              </span>
-            )}
-          </div>
-        );
-      }
-    }
-
-    return (
-      <>
-        <Button
-          variant="outlined"
-          size="sm"
-          onClick={prev}
-          disabled={page === 1}
-        >
-          Previous
-        </Button>
-        <div className="flex items-center gap-2">
-          {pages}
-        </div>
-        <Button
-          variant="outlined"
-          size="sm"
-          onClick={next}
-          disabled={page === lastPage}
-        >
-          Next
-        </Button>
-      </>
-    );
-  };
-
   const next = () => {
     if (page < lastPage) {
       setPage(page + 1);
@@ -186,6 +98,25 @@ export default function UsersTable({ color }) {
     }
   };
 
+  const nextSearch = () => {
+    if (page < lastPage) {
+      const newPage = page + 1;
+      setPage(newPage);
+      return newPage;
+    }
+    return page;
+  };
+
+  const prevSearch = () => {
+    if (page > 1) {
+      const newPage = page - 1;
+      setPage(newPage);
+      return newPage;
+    }
+    return page;
+  };
+
+
   const del = async (id) => {
     if (window.confirm("Delete this user?")) {
       await axios.delete(`users/${id}`);
@@ -196,10 +127,11 @@ export default function UsersTable({ color }) {
     }
   }
 
-  const findUser = async (value) => {
+  const findUser = async (searchValue, page = 1) => {
     try {
-      const { data } = await authenticationService.findByTitle(value);
-      setSearchResults(data); // Step 2: Set search results in state variable
+      const { data: searchData } = await authenticationService.findByTitle(searchValue, page);
+      setSearchResults(searchData.data);
+      setLastPage(searchData.meta.last_page);
     } catch (error) {
       if (error.response && error.response.status === 404) {
         console.log(error);
@@ -234,7 +166,7 @@ export default function UsersTable({ color }) {
                               <Input
                                 label="Search"
                                 icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-                                onChange={(e) => findUser(e.target.value)}
+                                onChange={(e) => { setSearchValue(e.target.value); findUser(e.target.value); }}
                               />
                             </div>
                             <Button className="flex items-center gap-3" size="sm">
@@ -245,146 +177,233 @@ export default function UsersTable({ color }) {
                       </div>
 
                       <div className="block w-full overflow-x-auto">
-                        <table className="items-center w-full bg-transparent border-collapse">
-                          <thead>
-                            <tr>
-                              <th
-                                className={
-                                  "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                  (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                }
-                              >
-                                Name
-                              </th>
-                              <th
-                                className={
-                                  "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                  (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                }
-                              >
-                                Username
-                              </th>
-                              <th
-                                className={
-                                  "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                  (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                }
-                              >
-                                Email
-                              </th>
-                              <th
-                                className={
-                                  "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                  (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                }
-                              >
-                                Role
-                              </th>
-                              <th
-                                className={
-                                  "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                  (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                }
-                              >
-                                Action
-                              </th>
+                        {searchResults.length > 0 ? ( // Step 3: Display search results when available
+                          searchResults.map((user) => (
+                            // * Use React.Fragment if you don't want error to show in your console that says
+                            // ! Warning: Each child in a list should have a unique "key" prop.
+                            <React.Fragment key={user.id}>
+                              <table className="items-center w-full bg-transparent border-collapse">
+                                <thead>
+                                  <tr>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Name
+                                    </th>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Username
+                                    </th>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Email
+                                    </th>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Role
+                                    </th>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Action
+                                    </th>
 
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {searchResults.length > 0 ? ( // Step 3: Display search results when available
-                              searchResults.map((user) => (
-                                <tr key={user.id}>
-                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                    {user.username}
-                                  </td>
-                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                    {user.username}
-                                  </td>
-                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                    {user.email}
-                                  </td>
-                                  <td
-                                    className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
-                                      ? "text-purple-500"
-                                      : user.role.name === "Moderator"
-                                        ? "text-blue-500"
-                                        : "text-green-500"
-                                      }`}
-                                  >
-                                    <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
-                                    {user.role.name}
-                                  </td>
-                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr key={user.id}>
+                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                      {user.username}
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                      {user.username}
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                      {user.email}
+                                    </td>
+                                    <td
+                                      className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
+                                        ? "text-purple-500"
+                                        : user.role.name === "Moderator"
+                                          ? "text-blue-500"
+                                          : "text-green-500"
+                                        }`}
+                                    >
+                                      <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
+                                      {user.role.name}
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
 
-                                    <Button color="blue" className="items-center gap-3">
-                                      <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
-                                    </Button>
+                                      <Button color="blue" className="items-center gap-3">
+                                        <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
+                                      </Button>
 
-                                    <Button color="red" className="items-center gap-3" onClick={() => del(user.id)}>
-                                      <TrashIcon strokeWidth={2} className="h-4 w-4" />
-                                    </Button>
+                                      <Button color="red" className="items-center gap-3" onClick={() => del(user.id)}>
+                                        <TrashIcon strokeWidth={2} className="h-4 w-4" />
+                                      </Button>
 
-                                  </td>
+                                    </td>
 
-                                </tr>
-                              ))
-                            ) : (
-                              // Display regular users list when there are no search results
-                              users.map((user) => (
-                                <tr key={user.id}>
-                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                    {user.username}
-                                  </td>
-                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                    {user.username}
-                                  </td>
-                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                    {user.email}
-                                  </td>
-                                  <td
-                                    className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
-                                      ? "text-purple-500"
-                                      : user.role.name === "Moderator"
-                                        ? "text-blue-500"
-                                        : "text-green-500"
-                                      }`}
-                                  >
-                                    <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
-                                    {user.role.name}
-                                  </td>
-                                  <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                  </tr>
+                                </tbody>
+                              </table>
 
-                                    <Button color="blue" className="items-center gap-3">
-                                      <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
-                                    </Button>
+                              <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
 
-                                    <Button color="red" className="items-center gap-3" onClick={() => del(user.id)}>
-                                      <TrashIcon strokeWidth={2} className="h-4 w-4" />
-                                    </Button>
+                                <Button variant="outlined" size="sm" onClick={() => searchValue ? findUser(searchValue, next()) : next()}>
+                                  Next
+                                </Button>
 
-                                  </td>
+                                <Button variant="outlined" size="sm" onClick={() => searchValue ? findUser(searchValue, prev()) : prev()}>
+                                  Previous
+                                </Button>
+                              </CardFooter>
 
-                                </tr>
-                              ))
-                            )}
+                            </React.Fragment>
 
-                          </tbody>
-                        </table>
 
-                        <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-                          {renderPagination()}
-                        </CardFooter>
+                          ))
+                        ) : (
+                          // Display regular users list when there are no search results
+                          users.map((user) => (
+                            // * Use React.Fragment if you don't want error to show in your console that says
+                            // ! Warning: Each child in a list should have a unique "key" prop.
+                            <React.Fragment key={user.id}>
+                              <table className="items-center w-full bg-transparent border-collapse">
+                                <thead>
+                                  <tr>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Name
+                                    </th>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Username
+                                    </th>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Email
+                                    </th>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Role
+                                    </th>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Action
+                                    </th>
+
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  <tr key={user.id}>
+                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                      {user.username}
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                      {user.username}
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                      {user.email}
+                                    </td>
+                                    <td
+                                      className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
+                                        ? "text-purple-500"
+                                        : user.role.name === "Moderator"
+                                          ? "text-blue-500"
+                                          : "text-green-500"
+                                        }`}
+                                    >
+                                      <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
+                                      {user.role.name}
+                                    </td>
+                                    <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+
+                                      <Button color="blue" className="items-center gap-3">
+                                        <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
+                                      </Button>
+
+                                      <Button color="red" className="items-center gap-3" onClick={() => del(user.id)}>
+                                        <TrashIcon strokeWidth={2} className="h-4 w-4" />
+                                      </Button>
+
+                                    </td>
+
+                                  </tr>
+                                </tbody>
+                              </table>
+                              <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
+                                <Button variant="outlined" size="sm" onClick={prev}>
+                                  Previous
+                                </Button>
+
+                                <Button variant="outlined" size="sm" onClick={next}>
+                                  Next
+                                </Button>
+                              </CardFooter>
+                            </React.Fragment>
+
+                          ))
+                        )}
+
 
                       </div>
                     </div>

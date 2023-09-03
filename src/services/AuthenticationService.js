@@ -26,9 +26,8 @@ class AuthenticationService {
         return http.post("/forgot", email);
     }
 
-
-    findByTitle(search) {
-        return http.get(`/users/user?search=${search}`);
+    findByTitle(search, page = 1) {
+        return http.get(`/users/user?search=${search}&page=${page}`);
     }
 
     //   getAll() {
