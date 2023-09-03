@@ -13,7 +13,11 @@ import {
   CardFooter,
   IconButton,
   Spinner,
-  Input
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
+  Input,
+  Textarea,
 } from "@material-tailwind/react";
 
 // layout for page
@@ -23,7 +27,8 @@ import Sidebar from "@/components/Sidebar/Sidebar.js";
 import HeaderStats from "@/components/Headers/HeaderStats.js";
 import FooterAdmin from "@/components/Footers/FooterAdmin.js";
 import Layout from "@/components/Layout";
-
+import CreateUser from "@/components/admin/modals/create.user";
+import { EditUser } from "@/components/admin/modals/edit.user";
 
 export default function UsersTable({ color }) {
   // Getting the user data
@@ -295,6 +300,28 @@ export default function UsersTable({ color }) {
     }
   }
 
+  // Create Modal
+  const [isModalOpenCreate, setIsModalOpenCreate] = useState(false);
+
+  const openModalCreate = () => {
+    setIsModalOpenCreate(true);
+  };
+
+  const closeModalCreate = () => {
+    setIsModalOpenCreate(false);
+  };
+
+  // Edit Modal
+  const [isModalOpenEdit, setIsModalOpenEdit] = useState(false);
+
+  const openModalEdit = () => {
+    setIsModalOpenEdit(true);
+  };
+
+  const closeModalEdit = () => {
+    setIsModalOpenEdit(false);
+  };
+
   return (
     <Layout>
       <>
@@ -324,7 +351,7 @@ export default function UsersTable({ color }) {
                                 onChange={(e) => { setSearchValue(e.target.value); findUser(e.target.value); }}
                               />
                             </div>
-                            <Button className="flex items-center gap-3" size="sm">
+                            <Button className="flex items-center gap-3" size="sm" onClick={openModalCreate}>
                               <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add user
                             </Button>
                           </div>
@@ -526,7 +553,7 @@ export default function UsersTable({ color }) {
                                     </td>
                                     <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
 
-                                      <Button color="blue" className="items-center gap-3">
+                                      <Button color="blue" className="items-center gap-3" onClick={openModalEdit}>
                                         <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
                                       </Button>
 
@@ -547,7 +574,8 @@ export default function UsersTable({ color }) {
                           ))
                         )}
 
-
+                        <EditUser isOpen={isModalOpenEdit} onClose={closeModalEdit} />
+                        <CreateUser isOpen={isModalOpenCreate} onClose={closeModalCreate} />
                       </div>
                     </div>
                   </div>
@@ -555,6 +583,7 @@ export default function UsersTable({ color }) {
               </div>
             </div>
             <FooterAdmin />
+
           </>
         ) : (
           <>
