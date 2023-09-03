@@ -38,6 +38,11 @@ export default function UsersTable({ color }) {
 
   const [page, setPage] = useState(1);
   const [lastPage, setLastPage] = useState(0);
+  const pages = [];
+
+  const [inputPage, setInputPage] = useState('');
+  const [isInputActive, setInputActive] = useState(false);
+  const [ellipsisClicked, setEllipsisClicked] = useState(false);
 
   useEffect(() => {
 
@@ -86,6 +91,175 @@ export default function UsersTable({ color }) {
 
   }, [page]);
 
+  const handlePageClick = (pageNumber) => {
+    if (pageNumber >= 1 && pageNumber <= lastPage) {
+      setPage(pageNumber);
+    }
+  };
+
+  const renderPagination = () => {
+
+
+    const handleInputPageChange = (e) => {
+      setInputPage(e.target.value);
+    };
+
+    const handleInputPageKeyPress = (e) => {
+      if (e.key === "Enter") {
+        const pageNumber = parseInt(inputPage);
+        if (pageNumber >= 1 && pageNumber <= lastPage) {
+          handlePageClick(pageNumber);
+        }
+        setInputPage('');
+        setInputActive(false);
+      }
+    };
+
+    for (let i = 1; i <= lastPage; i++) {
+      if (i === 1 || i === lastPage || (i >= page - 1 && i <= page + 1)) {
+        pages.push(
+          <IconButton
+            key={i}
+            size="sm"
+            onClick={() => handlePageClick(i)}
+            variant={i === page ? "outlined" : "text"}
+          >
+            {i}
+          </IconButton>
+        );
+      } else if (i === page - 2 || i === page + 2) {
+        // Show ellipsis for skipped pages, or input if clicked
+        pages.push(
+          <div key={i}>
+            {ellipsisClicked ? (
+              <input
+                type="number"
+                value={inputPage}
+                onChange={handleInputPageChange}
+                onKeyUp={handleInputPageKeyPress}
+                className="border rounded-md p-1 w-10 text-center"
+                placeholder="..."
+                min="1" // Set the minimum value to 1
+              />
+            ) : (
+              <span
+                className="text-gray-500 cursor-pointer"
+                onClick={() => setEllipsisClicked(true)}
+              >
+                ...
+              </span>
+            )}
+          </div>
+        );
+      }
+    }
+
+    return (
+      <>
+        <Button
+          variant="outlined"
+          size="sm"
+          onClick={prev}
+          disabled={page === 1}
+        >
+          Previous
+        </Button>
+        <div className="flex items-center gap-2">
+          {pages}
+        </div>
+        <Button
+          variant="outlined"
+          size="sm"
+          onClick={next}
+          disabled={page === lastPage}
+        >
+          Next
+        </Button>
+      </>
+    );
+  };
+
+  const renderPaginationSearch = () => {
+
+    const handleInputPageChange = (e) => {
+      setInputPage(e.target.value);
+    };
+
+    const handleInputPageKeyPress = (e) => {
+      if (e.key === "Enter") {
+        const pageNumber = parseInt(inputPage);
+        if (pageNumber >= 1 && pageNumber <= lastPage) {
+          handlePageClick(pageNumber);
+        }
+        setInputPage('');
+        setInputActive(false);
+      }
+    };
+
+    for (let i = 1; i <= lastPage; i++) {
+      if (i === 1 || i === lastPage || (i >= page - 1 && i <= page + 1)) {
+        pages.push(
+          <IconButton
+            key={i}
+            size="sm"
+            onClick={() => handlePageClick(i)}
+            variant={i === page ? "outlined" : "text"}
+          >
+            {i}
+          </IconButton>
+        );
+      } else if (i === page - 2 || i === page + 2) {
+        // Show ellipsis for skipped pages, or input if clicked
+        pages.push(
+          <div key={i}>
+            {ellipsisClicked ? (
+              <input
+                type="number"
+                value={inputPage}
+                onChange={handleInputPageChange}
+                onKeyUp={handleInputPageKeyPress}
+                className="border rounded-md p-1 w-10 text-center"
+                placeholder="..."
+                min="1" // Set the minimum value to 1
+              />
+            ) : (
+              <span
+                className="text-gray-500 cursor-pointer"
+                onClick={() => setEllipsisClicked(true)}
+              >
+                ...
+              </span>
+            )}
+          </div>
+        );
+      }
+    }
+
+    return (
+      <>
+        <Button
+          variant="outlined"
+          size="sm"
+          onClick={() => searchValue ? findUser(searchValue, prev()) : prev()}
+          disabled={page === 1}
+        >
+          Previous
+        </Button>
+        <div className="flex items-center gap-2">
+          {pages}
+        </div>
+        <Button
+          variant="outlined"
+          size="sm"
+          onClick={() => searchValue ? findUser(searchValue, next()) : next()}
+          disabled={page === lastPage}
+        >
+          Next
+        </Button>
+      </>
+    );
+  };
+
   const next = () => {
     if (page < lastPage) {
       setPage(page + 1);
@@ -97,25 +271,6 @@ export default function UsersTable({ color }) {
       setPage(page - 1);
     }
   };
-
-  const nextSearch = () => {
-    if (page < lastPage) {
-      const newPage = page + 1;
-      setPage(newPage);
-      return newPage;
-    }
-    return page;
-  };
-
-  const prevSearch = () => {
-    if (page > 1) {
-      const newPage = page - 1;
-      setPage(newPage);
-      return newPage;
-    }
-    return page;
-  };
-
 
   const del = async (id) => {
     if (window.confirm("Delete this user?")) {
@@ -278,13 +433,7 @@ export default function UsersTable({ color }) {
 
                               <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
 
-                                <Button variant="outlined" size="sm" onClick={() => searchValue ? findUser(searchValue, next()) : next()}>
-                                  Next
-                                </Button>
-
-                                <Button variant="outlined" size="sm" onClick={() => searchValue ? findUser(searchValue, prev()) : prev()}>
-                                  Previous
-                                </Button>
+                                {renderPaginationSearch()}
                               </CardFooter>
 
                             </React.Fragment>
@@ -391,13 +540,7 @@ export default function UsersTable({ color }) {
                                 </tbody>
                               </table>
                               <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-                                <Button variant="outlined" size="sm" onClick={prev}>
-                                  Previous
-                                </Button>
-
-                                <Button variant="outlined" size="sm" onClick={next}>
-                                  Next
-                                </Button>
+                                {renderPagination()}
                               </CardFooter>
                             </React.Fragment>
 
