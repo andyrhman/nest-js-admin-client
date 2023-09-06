@@ -36,16 +36,8 @@ export default function index() {
                     setUser(data);
                 } catch (error) {
                     if (error.response && error.response.status === 401) {
-                        setError('Authentication Error');
-
-                        // Set up a timer to redirect after 5 seconds
-                        setTimeout(() => {
-                            router.push('login');
-                        }, 5000); // 5000 milliseconds = 5 seconds
-
-                    } else {
                         setError('An error occurred');
-                        console.log(error);
+                        router.push('login');
                     }
                 }
             }
@@ -91,11 +83,13 @@ export default function index() {
                 ) : (
                     <>
                         {error && (
-                            <div className="relative my-44">
-                                <div className="flex justify-center mb-6">
-                                    <Spinner color="purple" className="h-16 w-16 text-gray-900/50" />
-                                </div>
-                            </div>
+                            <style jsx global>
+                                {`
+                                    body {
+                                        background: white;
+                                    }
+                                `}
+                            </style>
                         )}
                     </>
 

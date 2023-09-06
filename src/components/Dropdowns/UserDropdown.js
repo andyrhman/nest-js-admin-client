@@ -12,7 +12,7 @@ const UserDropdown = () => {
   // Logout
   const logout = async () => {
     await axios.post('logout', {});
-    router.push('/login');
+    router.push('login');
   }
 
   return (

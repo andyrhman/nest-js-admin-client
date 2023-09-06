@@ -7,8 +7,8 @@ import { User } from "@/models/user";
 const Navbar = () => {
   // Getting the user data
   const [user, setUser] = useState(new User());
-
   const [error, setError] = useState('');
+  const router = useRouter();
   useEffect(() => {
 
     (
@@ -23,10 +23,12 @@ const Navbar = () => {
         } catch (error) {
           if (error.response && error.response.status === 401) {
             setError('Authentication Error');
-            // Handle authentication error here
-          } else {
-            setError('An error occurred');
-            console.log(error);
+            router.push('/login');
+          }
+
+          if (error.response && error.response.status === 403) {
+            setError('Authentication Error');
+            router.push('/login');
           }
         }
       }

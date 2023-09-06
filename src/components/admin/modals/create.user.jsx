@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useRouter } from "next/router";
 import {
     Button,
     Dialog,
@@ -26,13 +27,26 @@ const CreateUser = ({ isOpen, onClose }) => {
 
     const [roles, setRoles] = useState([])
 
-
+    const router = useRouter();
     useEffect(() => {
 
         (
             async () => {
-                const { data } = await http.get('/roles');
-                setRoles(data);
+                try {
+                    const { data } = await http.get('/roles');
+                    setRoles(data);
+                } catch (error) {
+                    if (error.response && error.response.status === 401) {
+                        setError('An error occurred');
+                        router.push('/login');
+                    }
+
+                    if (error.response && error.response.status === 403) {
+                        setError('An error occurred');
+                        router.push('/login');
+                    }
+                }
+
             }
         )()
 
