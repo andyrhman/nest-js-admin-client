@@ -34,7 +34,7 @@ import Sidebar from "@/components/Sidebar/Sidebar.js";
 import HeaderStats from "@/components/Headers/HeaderStats.js";
 import FooterAdmin from "@/components/Footers/FooterAdmin.js";
 import Layout from "@/components/Layout";
-import CreateUser from "@/components/admin/modals/create.user";
+import CreateUser from "@/pages/dashboard/users/create.user";
 
 export default function EditUser({ color }) {
     const [email, setEmail] = useState('');

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
-import axios from "axios";
+import http from "@/services/Api";
 import authenticationService from "@/services/AuthenticationService";
 
 // components
@@ -15,6 +15,9 @@ import {
   Input
 } from "@material-tailwind/react";
 
+import { Slide, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 // layout for page
 
 import AdminNavbar from "@/components/Navbars/AdminNavbar.js";
@@ -22,7 +25,8 @@ import Sidebar from "@/components/Sidebar/Sidebar.js";
 import HeaderStats from "@/components/Headers/HeaderStats.js";
 import FooterAdmin from "@/components/Footers/FooterAdmin.js";
 import Layout from "@/components/Layout";
-import CreateUser from "@/components/admin/modals/create.user";
+import CreateUser from "@/pages/dashboard/users/create.user";
+import { NotificationDeleteDialog } from "@/components/admin/modals/delete.modal";
 
 export default function UsersTable({ color }) {
   // Getting the user data
@@ -47,7 +51,7 @@ export default function UsersTable({ color }) {
     (
       async () => {
         try {
-          const { data: data } = await axios.get(`users?page=${page}`);
+          const { data: data } = await http.get(`users?page=${page}`);
 
           setUsers(data.data);
           setLastPage(data.meta.last_page);
@@ -253,15 +257,36 @@ export default function UsersTable({ color }) {
     }
   };
 
-  const del = async (id) => {
-    if (window.confirm("Delete this user?")) {
-      await axios.delete(`users/${id}`);
+  // * Delete Modal
+  const [openDialog, setOpenDialog] = useState(false);
+  const [userIdToDelete, setUserIdToDelete] = useState(null);
 
-      setUsers(users.filter((u) => u.id !== id));
+  const handleOpenDialog = () => setOpenDialog(!openDialog);
 
+  const handleConfirmDelete = async () => {
+    await http.delete(`users/${userIdToDelete}`);
+    setUsers(users.filter((u) => u.id !== userIdToDelete));
+    handleOpenDialog();
+    toast.success('User Deleted Successfully!.', {
+      position: "top-center",
+      autoClose: 2000,
+      hideProgressBar: true,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+      theme: "colored",
+      transition: Slide
+    });
+    setTimeout(() => {
       window.location.reload();
-    }
-  }
+    }, 2000);
+  };
+
+  const del = (id) => {
+    setUserIdToDelete(id);
+    handleOpenDialog();
+  };
 
   const findUser = async (searchValue, page = 1) => {
     try {
@@ -285,17 +310,6 @@ export default function UsersTable({ color }) {
 
   const closeModalCreate = () => {
     setIsModalOpenCreate(false);
-  };
-
-  // Edit Modal
-  const [isModalOpenEdit, setIsModalOpenEdit] = useState(false);
-
-  const openModalEdit = () => {
-    setIsModalOpenEdit(true);
-  };
-
-  const closeModalEdit = () => {
-    setIsModalOpenEdit(false);
   };
 
   return (
@@ -443,6 +457,7 @@ export default function UsersTable({ color }) {
                     ))
                   ) : (
                     // Display regular users list when there are no search results
+                    // * {users.map((users) => ())}
                     users.map((user) => (
                       // * Use React.Fragment if you don't want error to show in your console that says
                       // ! Warning: Each child in a list should have a unique "key" prop.
@@ -550,6 +565,7 @@ export default function UsersTable({ color }) {
                   )}
 
                   <CreateUser isOpen={isModalOpenCreate} onClose={closeModalCreate} />
+                  <NotificationDeleteDialog open={openDialog} handleOpenDelete={handleOpenDialog} handleConfirmDelete={handleConfirmDelete} />
                 </div>
               </div>
             </div>
