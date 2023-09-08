@@ -278,10 +278,10 @@ export default function ProductsTable({ color }) {
   const handleOpenDialog = () => setOpenDialog(!openDialog);
 
   const handleConfirmDelete = async () => {
-    await http.delete(`roles/${userIdToDelete}`);
-    setRoles(roles.filter((u) => u.id !== userIdToDelete));
+    await http.delete(`products/${userIdToDelete}`);
+    setProducts(products.filter((u) => u.id !== userIdToDelete));
     handleOpenDialog();
-    toast.success('Role Deleted Successfully!.', {
+    toast.success('Procuts Deleted Successfully!.', {
       position: "top-center",
       autoClose: 2000,
       hideProgressBar: true,
