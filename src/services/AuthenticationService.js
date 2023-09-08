@@ -30,6 +30,10 @@ class AuthenticationService {
         return http.get(`/users/user?search=${search}&page=${page}`);
     }
 
+    findByProducts(search, page = 1) {
+        return http.get(`/products/product?search=${search}&page=${page}`);
+    }
+
     //   getAll() {
     //     return http.get("/pengguna");
     //   }
