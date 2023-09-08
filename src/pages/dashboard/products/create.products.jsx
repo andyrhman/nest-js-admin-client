@@ -8,7 +8,9 @@ import {
     Input,
     Alert,
     Typography,
+    Textarea
 } from "@material-tailwind/react";
+import ImageUploads from "@/components/admin/uploads/ImageUploads";
 import { Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import http from "@/services/Api";
@@ -99,8 +101,8 @@ const CreateProducts = ({ isOpen, onClose }) => {
                                 />
                             </div>
 
-                            <div className="mb-5">
-                                <Input
+                            <div className="mb-2">
+                                <Textarea
                                     label="Description"
                                     required
                                     onChange={(e) => setDescription(e.target.value)}
@@ -108,16 +110,20 @@ const CreateProducts = ({ isOpen, onClose }) => {
                             </div>
 
                             <div className="mb-5">
-                                <Input
-                                    label="Image"
-                                    required
-                                    onChange={(e) => setImage(e.target.value)}
+                                <Typography color="blue-gray" className="font-medium mb-2">
+                                    Choose a image
+                                </Typography>
+                                <input 
+                                value={image} 
+                                onChange={(e) => setImage(e.target.value)}
                                 />
+                                <ImageUploads uploaded={setImage}/>
                             </div>
 
                             <div className="mb-5">
                                 <Input
                                     label="Price"
+                                    type="number"
                                     required
                                     onChange={(e) => setPrice(e.target.value)}
                                 />

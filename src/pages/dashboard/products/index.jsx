@@ -12,7 +12,8 @@ import {
   Button,
   CardFooter,
   IconButton,
-  Input
+  Input,
+  Avatar
 } from "@material-tailwind/react";
 
 import { Slide, toast } from 'react-toastify';
@@ -415,7 +416,11 @@ export default function ProductsTable({ color }) {
                                 {product.description}
                               </td>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                {product.image}
+                                <img
+                                  className="w-full object-cover object-center"
+                                  src={product.image}
+                                  alt={product.title}
+                                />
                               </td>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                 {product.price}
@@ -512,7 +517,11 @@ export default function ProductsTable({ color }) {
                                 {product.description}
                               </td>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                {product.image}
+                                <img
+                                  className="w-full object-cover object-center"
+                                  src={product.image}
+                                  alt={product.title}
+                                />
                               </td>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
                                 {product.price}
