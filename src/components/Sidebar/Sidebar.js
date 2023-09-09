@@ -92,7 +92,7 @@ export default function Sidebar() {
                   className={
                     "text-xs uppercase py-3 font-bold block " +
                     (router.pathname === "/dashboard"
-                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      ? "text-sky-500 hover:text-sky-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
                 >
@@ -114,7 +114,7 @@ export default function Sidebar() {
                   className={
                     "text-xs uppercase py-3 font-bold block " +
                     (router.pathname.indexOf("/dashboard/users") !== -1
-                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      ? "text-sky-500 hover:text-sky-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
                 >
@@ -136,7 +136,7 @@ export default function Sidebar() {
                   className={
                     "text-xs uppercase py-3 font-bold block " +
                     (router.pathname.indexOf("/dashboard/roles") !== -1
-                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      ? "text-sky-500 hover:text-sky-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
                 >
@@ -158,7 +158,7 @@ export default function Sidebar() {
                   className={
                     "text-xs uppercase py-3 font-bold block " +
                     (router.pathname.indexOf("/dashboard/products") !== -1
-                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      ? "text-sky-500 hover:text-sky-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
                 >
@@ -180,7 +180,7 @@ export default function Sidebar() {
                   className={
                     "text-xs uppercase py-3 font-bold block " +
                     (router.pathname.indexOf("/dashboard/orders") !== -1
-                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      ? "text-sky-500 hover:text-sky-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
                 >
@@ -202,7 +202,7 @@ export default function Sidebar() {
                   className={
                     "text-xs uppercase py-3 font-bold block " +
                     (router.pathname.indexOf("/dashboard/settings") !== -1
-                      ? "text-lightBlue-500 hover:text-lightBlue-600"
+                      ? "text-sky-500 hover:text-sky-600"
                       : "text-blueGray-700 hover:text-blueGray-500")
                   }
                 >

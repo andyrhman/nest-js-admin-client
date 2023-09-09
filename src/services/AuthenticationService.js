@@ -34,6 +34,10 @@ class AuthenticationService {
         return http.get(`/products/product?search=${search}&page=${page}`);
     }
 
+    findByOrders(search, page = 1) {
+        return http.get(`/order?search=${search}&page=${page}`);
+    }
+
     //   getAll() {
     //     return http.get("/pengguna");
     //   }

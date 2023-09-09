@@ -5,7 +5,7 @@ import http from "@/services/Api";
 import authenticationService from "@/services/AuthenticationService";
 
 // components
-import { UserPlusIcon, TrashIcon, PencilSquareIcon, MagnifyingGlassIcon } from "@heroicons/react/24/solid";
+import { TrashIcon, PencilSquareIcon, MagnifyingGlassIcon, ShoppingBagIcon } from "@heroicons/react/24/solid";
 
 import {
   Typography,
@@ -13,7 +13,10 @@ import {
   CardFooter,
   IconButton,
   Input,
-  Avatar
+  Dialog,
+  DialogHeader,
+  DialogBody,
+  DialogFooter,
 } from "@material-tailwind/react";
 
 import { Slide, toast } from 'react-toastify';
@@ -27,11 +30,10 @@ import HeaderStats from "@/components/Headers/HeaderStats.js";
 import FooterAdmin from "@/components/Footers/FooterAdmin.js";
 import Layout from "@/components/Layout";
 import { NotificationDeleteDialog } from "@/components/admin/modals/delete.modal";
-import CreateProducts from "./create.products";
 
-export default function ProductsTable({ color }) {
+export default function OrdersTable({ color }) {
   // Getting the user data
-  const [products, setProducts] = useState([]);
+  const [orders, setOrders] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
   const [searchValue, setSearchValue] = useState("");
 
@@ -52,13 +54,13 @@ export default function ProductsTable({ color }) {
     (
       async () => {
         try {
-          const { data } = await http.get(`/products?page=${page}`);
+          const { data } = await http.get(`/orders?page=${page}`);
 
-          setProducts(data.data);
+          setOrders(data.data);
           setLastPage(data.meta.last_page);
 
           if (searchResults.length > 0 && page !== 1) {
-            findProducts(searchValue, page);
+            findOrders(searchValue, page);
           }
         } catch (error) {
           if (error.response && error.response.status === 401) {
@@ -258,9 +260,9 @@ export default function ProductsTable({ color }) {
     }
   };
 
-  const findProducts = async (searchValue, page = 1) => {
+  const findOrders = async (searchValue, page = 1) => {
     try {
-      const { data: searchData } = await authenticationService.findByProducts(searchValue, page);
+      const { data: searchData } = await authenticationService.findByOrders(searchValue, page);
       setSearchResults(searchData.data);
       setLastPage(searchData.meta.last_page);
     } catch (error) {
@@ -278,10 +280,10 @@ export default function ProductsTable({ color }) {
   const handleOpenDialog = () => setOpenDialog(!openDialog);
 
   const handleConfirmDelete = async () => {
-    await http.delete(`products/${userIdToDelete}`);
+    await http.delete(`orders/${userIdToDelete}`);
     setProducts(products.filter((u) => u.id !== userIdToDelete));
     handleOpenDialog();
-    toast.success('Products Deleted Successfully!.', {
+    toast.success('Order Deleted Successfully!.', {
       position: "top-center",
       autoClose: 2000,
       hideProgressBar: true,
@@ -301,16 +303,19 @@ export default function ProductsTable({ color }) {
   };
 
 
-  // * Create Modal
-  const [isModalOpenCreate, setIsModalOpenCreate] = useState(false);
+  // * Show Order Item
+  const [open, setOpen] = useState(false);
+  const [selectedOrder, setSelectedOrder] = useState(null);
 
-  const openModalCreate = () => {
-    setIsModalOpenCreate(true);
-  };
+  const handleOpen = (order) => {
+    setOpen(true);
+    setSelectedOrder(order);
+  }
 
-  const closeModalCreate = () => {
-    setIsModalOpenCreate(false);
-  };
+  const handleClose = () => {
+    setOpen(false);
+    setSelectedOrder(null);
+  }
 
 
   return (
@@ -329,7 +334,7 @@ export default function ProductsTable({ color }) {
                   <div className="mb-8 flex items-center justify-between gap-8">
                     <div>
                       <Typography variant="h5" color="blue-gray">
-                        Products List
+                        Orders List
                       </Typography>
                     </div>
                     <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
@@ -337,20 +342,17 @@ export default function ProductsTable({ color }) {
                         <Input
                           label="Search"
                           icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-                          onChange={(e) => { setSearchValue(e.target.value); findProducts(e.target.value); }}
+                          onChange={(e) => { setSearchValue(e.target.value); findOrders(e.target.value); }}
                         />
                       </div>
-                      <Button className="flex items-center gap-3" size="sm" onClick={openModalCreate}>
-                        <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Product
-                      </Button>
                     </div>
                   </div>
                 </div>
 
                 <div className="block w-full overflow-x-auto">
                   {searchResults.length > 0 ? ( // Step 3: Display search results when available
-                    searchResults.map((product) => (
-                      <React.Fragment key={product.id}>
+                    searchResults.map((order) => (
+                      <React.Fragment key={order.id}>
                         <table className="items-center w-full bg-transparent border-collapse">
                           <thead>
                             <tr>
@@ -362,7 +364,7 @@ export default function ProductsTable({ color }) {
                                     : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
                                 }
                               >
-                                Title
+                                Name
                               </th>
                               <th
                                 className={
@@ -372,7 +374,7 @@ export default function ProductsTable({ color }) {
                                     : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
                                 }
                               >
-                                Description
+                                Email
                               </th>
                               <th
                                 className={
@@ -382,17 +384,7 @@ export default function ProductsTable({ color }) {
                                     : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
                                 }
                               >
-                                Image
-                              </th>
-                              <th
-                                className={
-                                  "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                  (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                }
-                              >
-                                Price
+                                Total
                               </th>
                               <th
                                 className={
@@ -409,31 +401,22 @@ export default function ProductsTable({ color }) {
                           </thead>
 
                           <tbody>
-                            <tr key={product.id}>
+                            <tr key={order.id}>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                {product.title}
+                                {order.name}
                               </td>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                {product.description}
+                                {order.email}
                               </td>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                <img
-                                  className="w-full object-cover object-center"
-                                  src={product.image}
-                                  alt={product.title}
-                                />
+                                {order.total}
                               </td>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                {product.price}
-                              </td>
-                              <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                <Link href={`/dashboard/products/${product.id}`}>
-                                  <Button color="blue" className="items-center gap-3">
-                                    <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
-                                  </Button>
-                                </Link>
+                                <Button color="green" className="items-center gap-3" onClick={() => handleOpen(order)}>
+                                  <ShoppingBagIcon strokeWidth={2} className="h-4 w-4" />
+                                </Button>
 
-                                <Button color="red" className="items-center gap-3" onClick={() => del(product.id)}>
+                                <Button color="red" className="items-center gap-3" onClick={() => del(order.id)}>
                                   <TrashIcon strokeWidth={2} className="h-4 w-4" />
                                 </Button>
 
@@ -450,8 +433,8 @@ export default function ProductsTable({ color }) {
                       </React.Fragment>
                     ))
                   ) : (
-                    products.map((product) => (
-                      <React.Fragment key={product.id}>
+                    orders.map((order) => (
+                      <React.Fragment key={order.id}>
                         <table className="items-center w-full bg-transparent border-collapse">
                           <thead>
                             <tr>
@@ -463,7 +446,7 @@ export default function ProductsTable({ color }) {
                                     : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
                                 }
                               >
-                                Title
+                                Name
                               </th>
                               <th
                                 className={
@@ -473,7 +456,7 @@ export default function ProductsTable({ color }) {
                                     : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
                                 }
                               >
-                                Description
+                                Email
                               </th>
                               <th
                                 className={
@@ -483,17 +466,7 @@ export default function ProductsTable({ color }) {
                                     : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
                                 }
                               >
-                                Image
-                              </th>
-                              <th
-                                className={
-                                  "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                  (color === "light"
-                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                }
-                              >
-                                Price
+                                Total
                               </th>
                               <th
                                 className={
@@ -510,31 +483,23 @@ export default function ProductsTable({ color }) {
                           </thead>
 
                           <tbody>
-                            <tr key={product.id}>
+                            <tr key={order.id}>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                {product.title}
+                                {order.name}
                               </td>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                {product.description}
+                                {order.email}
                               </td>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                <img
-                                  className="w-40 object-cover object-center"
-                                  src={product.image}
-                                  alt={product.title}
-                                />
+                                {order.total}
                               </td>
                               <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                {product.price}
-                              </td>
-                              <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                <Link href={`/dashboard/products/${product.id}`}>
-                                  <Button color="blue" className="items-center gap-3">
-                                    <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
-                                  </Button>
-                                </Link>
+                                <Button color="green" className="items-center gap-3" onClick={() => handleOpen(order)}>
+                                  <ShoppingBagIcon strokeWidth={2} className="h-4 w-4" />
+                                </Button>
 
-                                <Button color="red" className="items-center gap-3" onClick={() => del(product.id)}>
+
+                                <Button color="red" className="items-center gap-3" onClick={() => del(order.id)}>
                                   <TrashIcon strokeWidth={2} className="h-4 w-4" />
                                 </Button>
 
@@ -548,11 +513,92 @@ export default function ProductsTable({ color }) {
                         <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
                           {renderPagination()}
                         </CardFooter>
+
+                        <Dialog open={open} handler={handleClose} size="lg">
+                          <div className="flex items-center justify-between">
+                            <DialogHeader>Create Products</DialogHeader>
+                            <svg
+                              xmlns="http://www.w3.org/2000/svg"
+                              viewBox="0 0 24 24"
+                              fill="currentColor"
+                              className="mr-3 h-5 w-5"
+                              onClick={handleClose} // Change this line
+                            >
+                              <path
+                                fillRule="evenodd"
+                                d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
+                                clipRule="evenodd"
+                              />
+                            </svg>
+                          </div>
+
+                          <DialogBody divider>
+                            <div className="grid gap-6">
+                              <table className="items-center w-full bg-transparent border-collapse">
+                                <thead>
+                                  <tr>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xl uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Product Name
+                                    </th>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xl uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Quantity
+                                    </th>
+                                    <th
+                                      className={
+                                        "px-6 align-middle border border-solid py-3 text-xl uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                        (color === "light"
+                                          ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                          : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                      }
+                                    >
+                                      Total
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody>
+                                  {selectedOrder && selectedOrder.order_items.map((item) => (
+                                    <tr key={item.id}>
+                                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xl whitespace-nowrap p-4">
+                                        {item.product_title}
+                                      </td>
+                                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xl whitespace-nowrap p-4">
+                                        {item.quantity}
+                                      </td>
+                                      <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xl whitespace-nowrap p-4">
+                                        {item.price}
+                                      </td>
+                                    </tr>
+
+                                  ))}
+                                </tbody>
+                              </table>
+                            </div>
+                          </DialogBody>
+                          <DialogFooter className="space-x-2">
+                            <Button variant="outlined" color="red" onClick={handleClose}>
+                              Close
+                            </Button>
+                          </DialogFooter>
+                        </Dialog>
+
                       </React.Fragment>
 
                     ))
                   )}
-                  <CreateProducts isOpen={isModalOpenCreate} onClose={closeModalCreate} />
                   <NotificationDeleteDialog open={openDialog} handleOpenDelete={handleOpenDialog} handleConfirmDelete={handleConfirmDelete} />
                 </div>
               </div>
@@ -561,10 +607,10 @@ export default function ProductsTable({ color }) {
         </div>
       </div>
       <FooterAdmin />
-    </Layout>
+    </Layout >
   );
 }
 
-ProductsTable.defaultProps = {
+OrdersTable.defaultProps = {
   color: "light",
 };
