@@ -5,7 +5,7 @@ import http from "@/services/Api";
 import authenticationService from "@/services/AuthenticationService";
 
 // components
-import { TrashIcon, PencilSquareIcon, MagnifyingGlassIcon, ShoppingBagIcon } from "@heroicons/react/24/solid";
+import { TrashIcon, ArrowDownTrayIcon, MagnifyingGlassIcon, ShoppingBagIcon } from "@heroicons/react/24/solid";
 
 import {
   Typography,
@@ -317,6 +317,16 @@ export default function OrdersTable({ color }) {
     setSelectedOrder(null);
   }
 
+  const handleExport = async () => {
+    const {data} = await http.post('/export', {}, {responseType: 'blob'});
+    const blob = new Blob([data], {type: 'text/csv'});
+    const url = window.URL.createObjectURL(data);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'orders.csv';
+    link.click();
+  }
+
 
   return (
     <Layout>
@@ -345,6 +355,9 @@ export default function OrdersTable({ color }) {
                           onChange={(e) => { setSearchValue(e.target.value); findOrders(e.target.value); }}
                         />
                       </div>
+                      <Button className="flex items-center gap-3" size="sm" onClick={handleExport}>
+                        <ArrowDownTrayIcon strokeWidth={2} className="h-4 w-4" /> Export Orders
+                      </Button>
                     </div>
                   </div>
                 </div>
