@@ -21,10 +21,10 @@ import 'react-toastify/dist/ReactToastify.css';
 
 // layout for page
 
-import AdminNavbar from "@/components/Navbars/AdminNavbar.js";
-import Sidebar from "@/components/Sidebar/Sidebar.js";
-import HeaderStats from "@/components/Headers/HeaderStats.js";
-import FooterAdmin from "@/components/Footers/FooterAdmin.js";
+import AdminNavbar from "@/components/admin/Navbars/AdminNavbar.js";
+import Sidebar from "@/components/admin/Sidebar/Sidebar.js";
+import HeaderStats from "@/components/admin/Headers/HeaderStats.js";
+import FooterAdmin from "@/components/admin/Footers/FooterAdmin.js";
 import Layout from "@/components/Layout";
 import { NotificationDeleteDialog } from "@/components/admin/modals/delete.modal";
 import CreateProducts from "./create.products";

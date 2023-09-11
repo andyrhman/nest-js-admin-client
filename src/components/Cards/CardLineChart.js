@@ -20,8 +20,8 @@ export default function CardLineChart() {
           datasets: [{
             label: 'Sales',
             data: data.map((r) => r.sum),
-            backgroundColor: 'rgba(75, 192, 192, 0.2)',
-            borderColor: 'rgba(75, 192, 192, 1)',
+            backgroundColor: 'rgba(222, 171, 189)',
+            borderColor: 'rgba(181, 38, 88)',
             borderWidth: 1,
             pointStyle: 'circle',
             pointRadius: 10,

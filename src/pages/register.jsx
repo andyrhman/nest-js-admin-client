@@ -27,6 +27,8 @@ const daftar = () => {
     const [error, setError] = useState('');
     const router = useRouter(); // Initialize the router instance
 
+    const [strength, setStrength] = useState(0);
+
     const create = async (e) => {
         e.preventDefault();
         setEmailError(false);
@@ -88,7 +90,7 @@ const daftar = () => {
         } else {
             // Make an API request to validate the username
             try {
-                const response = await AuthenticationService.findByTitle(username);
+                const response = await AuthenticationService.findUsersRegister(username);
                 if (response.data.length > 0) {
                     // If the username already exists, display an error message
                     setUsernameError('Username already exists');
@@ -110,7 +112,7 @@ const daftar = () => {
         } else {
             // Make an API request to validate the email
             try {
-                const response = await AuthenticationService.findByTitle(email);
+                const response = await AuthenticationService.findUsersRegister(email);
                 if (response.data.length > 0) {
                     // If the email already exists, display an error message
                     setEmailError('Email already exists');
@@ -122,9 +124,21 @@ const daftar = () => {
         }
     };
 
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        if (password.match(/[a-z]/)) strength++; // lower case letter
+        if (password.match(/[A-Z]/)) strength++; // upper case letter
+        if (password.match(/[0-9]/)) strength++; // number
+        if (password.match(/[^a-zA-Z0-9]/)) strength++; // special character
+        if (password.length >= 6) strength++; // length 8 or more
+        return strength;
+    }
+
     const validatePassword = (value) => {
         setPassword(value);
         setPasswordError('');
+        const strength = checkPasswordStrength(value);
+        setStrength(strength);
 
         if (!value) {
             setPasswordError('Password is required');
@@ -132,6 +146,28 @@ const daftar = () => {
             setPasswordError('Password must be at least 6 characters long');
         }
     };
+
+    const strengthBarColor = () => {
+        switch (strength) {
+            case 1: return 'red';
+            case 2: return 'orange';
+            case 3: return 'yellow';
+            case 4: return 'lime';
+            case 5: return 'green';
+            default: return 'gray';
+        }
+    }
+
+    const strengthText = () => {
+        switch (strength) {
+            case 1: return 'Too short';
+            case 2: return 'Weak';
+            case 3: return 'Okay';
+            case 4: return 'Good';
+            case 5: return 'Strong';
+            default: return '';
+        }
+    }
 
     const validateConfirmPassword = (value) => {
         setConfirmPassword(value);
@@ -206,8 +242,20 @@ const daftar = () => {
                                         required
                                         error={!!passwordError} // Pass the error state as a prop
                                         onChange={(e) => validatePassword(e.target.value)}
-
                                     />
+                                    <div style={{
+                                        fontSize: '12px',
+                                        textAlign: 'right',
+                                        color: strengthBarColor(),
+                                    }}>
+                                        {strengthText()}
+                                    </div>
+                                    <div style={{
+                                        height: '10px',
+                                        width: `${strength * 20}%`,
+                                        backgroundColor: strengthBarColor(),
+                                        transition: 'width 0.3s ease-in-out',
+                                    }} />
                                     {passwordError && <div className="text-red-500 text-xs mt-1">{passwordError}</div>}
                                 </div>
 

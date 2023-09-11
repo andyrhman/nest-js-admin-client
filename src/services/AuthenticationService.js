@@ -30,6 +30,10 @@ class AuthenticationService {
         return http.get(`/users/user?search=${search}&page=${page}`);
     }
 
+    findUsersRegister(search) {
+        return http.get(`/users/userf?search=${search}`);
+    }
+
     findByProducts(search, page = 1) {
         return http.get(`/products/product?search=${search}&page=${page}`);
     }
