@@ -29,11 +29,7 @@ import http from "@/services/Api";
 
 // layout for page
 
-import AdminNavbar from "@/components/admin/Navbars/AdminNavbar.js";
-import Sidebar from "@/components/admin/Sidebar/Sidebar.js";
-import HeaderStats from "@/components/admin/Headers/HeaderStats.js";
-import FooterAdmin from "@/components/admin/Footers/FooterAdmin.js";
-import Layout from "@/components/Layout";
+import AdminWrapper from "@/components/admin/AdminWrapper";
 import CreateUser from "@/pages/dashboard/users/create.user";
 
 export default function EditUser({ color }) {
@@ -460,366 +456,333 @@ export default function EditUser({ color }) {
 
 
     return (
-        <Layout>
-            <>
-                {Datauser ? (
-                    <>
-                        <Sidebar />
-                        <div className="relative md:ml-64 bg-blueGray-100">
-                            <AdminNavbar />
-                            {/* Header */}
-                            <HeaderStats />
-                            <div className="px-4 md:px-10 mx-auto w-full -m-24">
-                                <div className="flex flex-wrap mt-4">
-                                    <div className="w-full mb-12 px-4">
-                                        <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded light bg-white" >
-                                            <div className="rounded-t mb-0 px-4 py-3 border-0">
-                                                <div className="mb-8 flex items-center justify-between gap-8">
-                                                    <div>
-                                                        <Typography variant="h5" color="blue-gray">
-                                                            Users List
-                                                        </Typography>
-                                                    </div>
-                                                    <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                                                        <div className="w-full md:w-72">
-                                                            <Input
-                                                                label="Search"
-                                                                icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-                                                                onChange={(e) => { setSearchValue(e.target.value); findUser(e.target.value); }}
-                                                            />
-                                                        </div>
-                                                        <Button className="flex items-center gap-3" size="sm" onClick={openModalCreate}>
-                                                            <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add user
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            <div className="block w-full overflow-x-auto">
-                                                {searchResults.length > 0 ? ( // Step 3: Display search results when available
-                                                    searchResults.map((user) => (
-                                                        // * Use React.Fragment if you don't want error to show in your console that says
-                                                        // ! Warning: Each child in a list should have a unique "key" prop.
-                                                        <React.Fragment key={user.id}>
-                                                            <table className="items-center w-full bg-transparent border-collapse">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th
-                                                                            className={
-                                                                                "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                                (color === "light"
-                                                                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                            }
-                                                                        >
-                                                                            Name
-                                                                        </th>
-                                                                        <th
-                                                                            className={
-                                                                                "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                                (color === "light"
-                                                                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                            }
-                                                                        >
-                                                                            Username
-                                                                        </th>
-                                                                        <th
-                                                                            className={
-                                                                                "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                                (color === "light"
-                                                                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                            }
-                                                                        >
-                                                                            Email
-                                                                        </th>
-                                                                        <th
-                                                                            className={
-                                                                                "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                                (color === "light"
-                                                                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                            }
-                                                                        >
-                                                                            Role
-                                                                        </th>
-                                                                        <th
-                                                                            className={
-                                                                                "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                                (color === "light"
-                                                                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                            }
-                                                                        >
-                                                                            Action
-                                                                        </th>
-
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <tr key={user.id}>
-                                                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                            {user.username}
-                                                                        </td>
-                                                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                            {user.username}
-                                                                        </td>
-                                                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                            {user.email}
-                                                                        </td>
-                                                                        <td
-                                                                            className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
-                                                                                ? "text-purple-500"
-                                                                                : user.role.name === "Moderator"
-                                                                                    ? "text-blue-500"
-                                                                                    : "text-green-500"
-                                                                                }`}
-                                                                        >
-                                                                            <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
-                                                                            {user.role.name}
-                                                                        </td>
-                                                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-
-                                                                            <Button color="blue" className="items-center gap-3">
-                                                                                <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
-                                                                            </Button>
-
-                                                                            <Button color="red" className="items-center gap-3" onClick={() => del(user.id)}>
-                                                                                <TrashIcon strokeWidth={2} className="h-4 w-4" />
-                                                                            </Button>
-
-                                                                        </td>
-
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-
-                                                            <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-
-                                                                {renderPaginationSearch()}
-                                                            </CardFooter>
-
-                                                        </React.Fragment>
-
-
-                                                    ))
-                                                ) : (
-                                                    // Display regular users list when there are no search results
-                                                    users.map((user) => (
-                                                        // * Use React.Fragment if you don't want error to show in your console that says
-                                                        // ! Warning: Each child in a list should have a unique "key" prop.
-                                                        <React.Fragment key={user.id}>
-                                                            <table className="items-center w-full bg-transparent border-collapse">
-                                                                <thead>
-                                                                    <tr>
-                                                                        <th
-                                                                            className={
-                                                                                "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                                (color === "light"
-                                                                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                            }
-                                                                        >
-                                                                            Name
-                                                                        </th>
-                                                                        <th
-                                                                            className={
-                                                                                "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                                (color === "light"
-                                                                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                            }
-                                                                        >
-                                                                            Username
-                                                                        </th>
-                                                                        <th
-                                                                            className={
-                                                                                "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                                (color === "light"
-                                                                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                            }
-                                                                        >
-                                                                            Email
-                                                                        </th>
-                                                                        <th
-                                                                            className={
-                                                                                "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                                (color === "light"
-                                                                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                            }
-                                                                        >
-                                                                            Role
-                                                                        </th>
-                                                                        <th
-                                                                            className={
-                                                                                "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                                (color === "light"
-                                                                                    ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                                    : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                            }
-                                                                        >
-                                                                            Action
-                                                                        </th>
-
-                                                                    </tr>
-                                                                </thead>
-                                                                <tbody>
-                                                                    <tr key={user.id}>
-                                                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                            {user.username}
-                                                                        </td>
-                                                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                            {user.username}
-                                                                        </td>
-                                                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                            {user.email}
-                                                                        </td>
-                                                                        <td
-                                                                            className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
-                                                                                ? "text-purple-500"
-                                                                                : user.role.name === "Moderator"
-                                                                                    ? "text-blue-500"
-                                                                                    : "text-green-500"
-                                                                                }`}
-                                                                        >
-                                                                            <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
-                                                                            {user.role.name}
-                                                                        </td>
-                                                                        <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                            <Link href={`/dashboard/users/${user.id}`}>
-                                                                                <Button color="blue" className="items-center gap-3">
-                                                                                    <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
-                                                                                </Button>
-                                                                            </Link>
-
-                                                                            <Button color="red" className="items-center gap-3" onClick={() => del(user.id)}>
-                                                                                <TrashIcon strokeWidth={2} className="h-4 w-4" />
-                                                                            </Button>
-
-                                                                        </td>
-
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                            <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-                                                                {renderPagination()}
-                                                            </CardFooter>
-                                                        </React.Fragment>
-
-                                                    ))
-                                                )}
-
-                                                <CreateUser isOpen={isModalOpenCreate} onClose={closeModalCreate} />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+        <AdminWrapper>
+            <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded light bg-white" >
+                <div className="rounded-t mb-0 px-4 py-3 border-0">
+                    <div className="mb-8 flex items-center justify-between gap-8">
+                        <div>
+                            <Typography variant="h5" color="blue-gray">
+                                Users List
+                            </Typography>
                         </div>
-                        <Dialog open={open} handler={handleOpen}>
-                            <div className="flex items-center justify-between">
-                                <DialogHeader>Create New User</DialogHeader>
-                                <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 24 24"
-                                    fill="currentColor"
-                                    className="mr-3 h-5 w-5"
-                                    onClick={handleOpen} // Change this line
-                                >
-                                    <path
-                                        fillRule="evenodd"
-                                        d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
-                                        clipRule="evenodd"
-                                    />
-                                </svg>
+                        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+                            <div className="w-full md:w-72">
+                                <Input
+                                    label="Search"
+                                    icon={<MagnifyingGlassIcon className="h-5 w-5" />}
+                                    onChange={(e) => { setSearchValue(e.target.value); findUser(e.target.value); }}
+                                />
                             </div>
-                            <form onSubmit={submit}>
-                                <DialogBody divider>
-                                    <div className="grid gap-6">
-                                        {error && (
-                                            <Alert color="red" className="mt-2 text-center font-normal">
-                                                {error}
-                                            </Alert>
-                                        )}
+                            <Button className="flex items-center gap-3" size="sm" onClick={openModalCreate}>
+                                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add user
+                            </Button>
+                        </div>
+                    </div>
+                </div>
 
-                                        <div className="mb-5">
-                                            <Input
-                                                label="Username"
-                                                defaultValue={username}
-                                                error={!!usernameError} // Pass the error state as a prop
-                                                onChange={(e) => setUsername(e.target.value)}
-                                                onBlur={validateUsername}
-
-                                            />
-                                            {usernameError && <div className="text-red-500 text-xs mt-1">{usernameError}</div>}
-                                        </div>
-                                        <div className="mb-5">
-                                            <Input
-                                                label="Email"
-                                                type="email"
-                                                defaultValue={email}
-                                                error={!!emailError} // Pass the error state as a prop
-                                                onChange={(e) => setEmail(e.target.value)}
-                                                onBlur={validateEmail}
-
-                                            />
-                                            {emailError && <div className="text-red-500 text-xs mt-1">{emailError}</div>}
-                                        </div>
-
-                                        <div className="mb-5 relative">
-                                            <select
-                                                className="block appearance-none w-full bg-gray-200 border border-gray-400 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state"
-                                                value={role_id}
-                                                onChange={e => setRoleId(e.target.value)}
+                <div className="block w-full overflow-x-auto">
+                    {searchResults.length > 0 ? ( // Step 3: Display search results when available
+                        searchResults.map((user) => (
+                            // * Use React.Fragment if you don't want error to show in your console that says
+                            // ! Warning: Each child in a list should have a unique "key" prop.
+                            <React.Fragment key={user.id}>
+                                <table className="items-center w-full bg-transparent border-collapse">
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
                                             >
-                                                {roles.map((role) => (
-                                                    <option key={role.id} value={role.id}>
-                                                        {role.name}
-                                                    </option>
-                                                ))}
-                                            </select>
-                                            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                                <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
-                                            </div>
-                                            {roleIdError && <div className="text-red-500 text-xs mt-1">{roleIdError}</div>}
-                                        </div>
+                                                Name
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Username
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Email
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Role
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Action
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr key={user.id}>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {user.username}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {user.username}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {user.email}
+                                            </td>
+                                            <td
+                                                className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
+                                                    ? "text-purple-500"
+                                                    : user.role.name === "Moderator"
+                                                        ? "text-blue-500"
+                                                        : "text-green-500"
+                                                    }`}
+                                            >
+                                                <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
+                                                {user.role.name}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+
+                                                <Button color="blue" className="items-center gap-3">
+                                                    <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
+                                                </Button>
+
+                                                <Button color="red" className="items-center gap-3" onClick={() => del(user.id)}>
+                                                    <TrashIcon strokeWidth={2} className="h-4 w-4" />
+                                                </Button>
+
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+
+                                <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
+
+                                    {renderPaginationSearch()}
+                                </CardFooter>
+
+                            </React.Fragment>
+
+
+                        ))
+                    ) : (
+                        // Display regular users list when there are no search results
+                        users.map((user) => (
+                            // * Use React.Fragment if you don't want error to show in your console that says
+                            // ! Warning: Each child in a list should have a unique "key" prop.
+                            <React.Fragment key={user.id}>
+                                <table className="items-center w-full bg-transparent border-collapse">
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Name
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Username
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Email
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Role
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Action
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr key={user.id}>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {user.username}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {user.username}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {user.email}
+                                            </td>
+                                            <td
+                                                className={`border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 ${user.role.name === "Admin"
+                                                    ? "text-purple-500"
+                                                    : user.role.name === "Moderator"
+                                                        ? "text-blue-500"
+                                                        : "text-green-500"
+                                                    }`}
+                                            >
+                                                <i className={`fas fa-circle mr-2 ${user.role.name === "Admin" ? "text-purple-500" : user.role.name === "Moderator" ? "text-blue-500" : "text-green-500"}`}></i>{" "}
+                                                {user.role.name}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                <Link href={`/dashboard/users/${user.id}`}>
+                                                    <Button color="blue" className="items-center gap-3">
+                                                        <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
+                                                    </Button>
+                                                </Link>
+
+                                                <Button color="red" className="items-center gap-3" onClick={() => del(user.id)}>
+                                                    <TrashIcon strokeWidth={2} className="h-4 w-4" />
+                                                </Button>
+
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
+                                    {renderPagination()}
+                                </CardFooter>
+                            </React.Fragment>
+
+                        ))
+                    )}
+
+                    <CreateUser isOpen={isModalOpenCreate} onClose={closeModalCreate} />
+                </div>
+            </div>
+            <Dialog open={open} handler={handleOpen}>
+                <div className="flex items-center justify-between">
+                    <DialogHeader>Create New User</DialogHeader>
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 24 24"
+                        fill="currentColor"
+                        className="mr-3 h-5 w-5"
+                        onClick={handleOpen} // Change this line
+                    >
+                        <path
+                            fillRule="evenodd"
+                            d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
+                            clipRule="evenodd"
+                        />
+                    </svg>
+                </div>
+                <form onSubmit={submit}>
+                    <DialogBody divider>
+                        <div className="grid gap-6">
+                            {error && (
+                                <Alert color="red" className="mt-2 text-center font-normal">
+                                    {error}
+                                </Alert>
+                            )}
+
+                            <div className="mb-5">
+                                <Input
+                                    label="Username"
+                                    defaultValue={username}
+                                    error={!!usernameError} // Pass the error state as a prop
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    onBlur={validateUsername}
+
+                                />
+                                {usernameError && <div className="text-red-500 text-xs mt-1">{usernameError}</div>}
+                            </div>
+                            <div className="mb-5">
+                                <Input
+                                    label="Email"
+                                    type="email"
+                                    defaultValue={email}
+                                    error={!!emailError} // Pass the error state as a prop
+                                    onChange={(e) => setEmail(e.target.value)}
+                                    onBlur={validateEmail}
+
+                                />
+                                {emailError && <div className="text-red-500 text-xs mt-1">{emailError}</div>}
+                            </div>
+
+                            <div className="mb-5 relative">
+                                <select
+                                    className="block appearance-none w-full bg-gray-200 border border-gray-400 text-gray-700 py-3 px-4 pr-8 rounded leading-tight focus:outline-none focus:bg-white focus:border-gray-500" id="grid-state"
+                                    value={role_id}
+                                    onChange={e => setRoleId(e.target.value)}
+                                >
+                                    {roles.map((role) => (
+                                        <option key={role.id} value={role.id}>
+                                            {role.name}
+                                        </option>
+                                    ))}
+                                </select>
+                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"><path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" /></svg>
+                                </div>
+                                {roleIdError && <div className="text-red-500 text-xs mt-1">{roleIdError}</div>}
+                            </div>
 
 
 
-                                    </div>
-                                </DialogBody>
-                                <DialogFooter className="space-x-2">
-                                    <Button variant="outlined" color="red" onClick={handleOpen}>
-                                        close
-                                    </Button>
-                                    <Button variant="gradient" color="blue" type='submit'>
-                                        Submit
-                                    </Button>
-                                </DialogFooter>
-                            </form>
-                        </Dialog>
-                        <FooterAdmin />
-
-                    </>
-                ) : (
-                    <>
-                        {error && (
-                            <style jsx global>
-                                {`
-                          body {
-                              background: white;
-                          }
-                      `}
-                            </style>
-                        )}
-                    </>
-
-                )}
-            </>
-        </Layout>
+                        </div>
+                    </DialogBody>
+                    <DialogFooter className="space-x-2">
+                        <Button variant="outlined" color="red" onClick={handleOpen}>
+                            close
+                        </Button>
+                        <Button variant="gradient" color="blue" type='submit'>
+                            Submit
+                        </Button>
+                    </DialogFooter>
+                </form>
+            </Dialog>
+        </AdminWrapper>
     );
 }
 

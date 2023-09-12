@@ -20,16 +20,12 @@ import {
     IconButton
 } from "@material-tailwind/react";
 
+import AdminWrapper from "@/components/admin/AdminWrapper";
 import { Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // layout for page
 
-import AdminNavbar from "@/components/admin/Navbars/AdminNavbar.js";
-import Sidebar from "@/components/admin/Sidebar/Sidebar.js";
-import HeaderStats from "@/components/admin/Headers/HeaderStats.js";
-import FooterAdmin from "@/components/admin/Footers/FooterAdmin.js";
-import Layout from "@/components/Layout";
 import { NotificationDeleteDialog } from "@/components/admin/modals/delete.modal";
 import CreateProducts from "./create.products";
 import ImageUploads from "@/components/admin/uploads/ImageUploads";
@@ -412,250 +408,237 @@ export default function EditProducts({ color }) {
 
 
     return (
-        <Layout>
-
-            <Sidebar />
-            <div className="relative md:ml-64 bg-blueGray-100">
-                <AdminNavbar />
-                {/* Header */}
-                <HeaderStats />
-                <div className="px-4 md:px-10 mx-auto w-full -m-24">
-                    <div className="flex flex-wrap mt-4">
-                        <div className="w-full mb-12 px-4">
-                            <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded light bg-white" >
-                                <div className="rounded-t mb-0 px-4 py-3 border-0">
-                                    <div className="mb-8 flex items-center justify-between gap-8">
-                                        <div>
-                                            <Typography variant="h5" color="blue-gray">
-                                                Products List
-                                            </Typography>
-                                        </div>
-                                        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
-                                            <div className="w-full md:w-72">
-                                                <Input
-                                                    label="Search"
-                                                    icon={<MagnifyingGlassIcon className="h-5 w-5" />}
-                                                    onChange={(e) => { setSearchValue(e.target.value); findProducts(e.target.value); }}
-                                                />
-                                            </div>
-                                            <Button className="flex items-center gap-3" size="sm" onClick={openModalCreate}>
-                                                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Product
-                                            </Button>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <div className="block w-full overflow-x-auto">
-                                    {searchResults.length > 0 ? ( // Step 3: Display search results when available
-                                        searchResults.map((product) => (
-                                            <React.Fragment key={product.id}>
-                                                <table className="items-center w-full bg-transparent border-collapse">
-                                                    <thead>
-                                                        <tr>
-                                                            <th
-                                                                className={
-                                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                    (color === "light"
-                                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                }
-                                                            >
-                                                                Title
-                                                            </th>
-                                                            <th
-                                                                className={
-                                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                    (color === "light"
-                                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                }
-                                                            >
-                                                                Description
-                                                            </th>
-                                                            <th
-                                                                className={
-                                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                    (color === "light"
-                                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                }
-                                                            >
-                                                                Image
-                                                            </th>
-                                                            <th
-                                                                className={
-                                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                    (color === "light"
-                                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                }
-                                                            >
-                                                                Price
-                                                            </th>
-                                                            <th
-                                                                className={
-                                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                    (color === "light"
-                                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                }
-                                                            >
-                                                                Action
-                                                            </th>
-
-                                                        </tr>
-                                                    </thead>
-
-                                                    <tbody>
-                                                        <tr key={product.id}>
-                                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                {product.title}
-                                                            </td>
-                                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                {product.description}
-                                                            </td>
-                                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                <img
-                                                                    className="w-full object-cover object-center"
-                                                                    src={product.image}
-                                                                    alt={product.title}
-                                                                />
-                                                            </td>
-                                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                {product.price}
-                                                            </td>
-                                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                <Link href={`/dashboard/products/${product.id}`}>
-                                                                    <Button color="blue" className="items-center gap-3">
-                                                                        <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
-                                                                    </Button>
-                                                                </Link>
-
-                                                                <Button color="red" className="items-center gap-3" onClick={() => del(product.id)}>
-                                                                    <TrashIcon strokeWidth={2} className="h-4 w-4" />
-                                                                </Button>
-
-                                                            </td>
-
-                                                        </tr>
-                                                    </tbody>
-
-
-                                                </table>
-                                                <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-                                                    {renderPaginationSearch()}
-                                                </CardFooter>
-                                            </React.Fragment>
-                                        ))
-                                    ) : (
-                                        products.map((product) => (
-                                            <React.Fragment key={product.id}>
-                                                <table className="items-center w-full bg-transparent border-collapse">
-                                                    <thead>
-                                                        <tr>
-                                                            <th
-                                                                className={
-                                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                    (color === "light"
-                                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                }
-                                                            >
-                                                                Title
-                                                            </th>
-                                                            <th
-                                                                className={
-                                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                    (color === "light"
-                                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                }
-                                                            >
-                                                                Description
-                                                            </th>
-                                                            <th
-                                                                className={
-                                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                    (color === "light"
-                                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                }
-                                                            >
-                                                                Image
-                                                            </th>
-                                                            <th
-                                                                className={
-                                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                    (color === "light"
-                                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                }
-                                                            >
-                                                                Price
-                                                            </th>
-                                                            <th
-                                                                className={
-                                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
-                                                                    (color === "light"
-                                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
-                                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
-                                                                }
-                                                            >
-                                                                Action
-                                                            </th>
-
-                                                        </tr>
-                                                    </thead>
-
-                                                    <tbody>
-                                                        <tr key={product.id}>
-                                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                {product.title}
-                                                            </td>
-                                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                {product.description}
-                                                            </td>
-                                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                <img
-                                                                    className="w-full object-cover object-center"
-                                                                    src={product.image}
-                                                                    alt={product.title}
-                                                                />
-                                                            </td>
-                                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                {product.price}
-                                                            </td>
-                                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
-                                                                <Link href={`/dashboard/products/${product.id}`}>
-                                                                    <Button color="blue" className="items-center gap-3">
-                                                                        <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
-                                                                    </Button>
-                                                                </Link>
-
-                                                                <Button color="red" className="items-center gap-3" onClick={() => del(product.id)}>
-                                                                    <TrashIcon strokeWidth={2} className="h-4 w-4" />
-                                                                </Button>
-
-                                                            </td>
-
-                                                        </tr>
-                                                    </tbody>
-
-
-                                                </table>
-                                                <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
-                                                    {renderPagination()}
-                                                </CardFooter>
-                                            </React.Fragment>
-
-                                        ))
-                                    )}
-                                    <CreateProducts isOpen={isModalOpenCreate} onClose={closeModalCreate} />
-                                    <NotificationDeleteDialog open={openDialog} handleOpenDelete={handleOpenDialog} handleConfirmDelete={handleConfirmDelete} />
-                                </div>
+        <AdminWrapper>
+            <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded light bg-white" >
+                <div className="rounded-t mb-0 px-4 py-3 border-0">
+                    <div className="mb-8 flex items-center justify-between gap-8">
+                        <div>
+                            <Typography variant="h5" color="blue-gray">
+                                Products List
+                            </Typography>
+                        </div>
+                        <div className="flex shrink-0 flex-col gap-2 sm:flex-row">
+                            <div className="w-full md:w-72">
+                                <Input
+                                    label="Search"
+                                    icon={<MagnifyingGlassIcon className="h-5 w-5" />}
+                                    onChange={(e) => { setSearchValue(e.target.value); findProducts(e.target.value); }}
+                                />
                             </div>
+                            <Button className="flex items-center gap-3" size="sm" onClick={openModalCreate}>
+                                <UserPlusIcon strokeWidth={2} className="h-4 w-4" /> Add Product
+                            </Button>
                         </div>
                     </div>
+                </div>
+
+                <div className="block w-full overflow-x-auto">
+                    {searchResults.length > 0 ? ( // Step 3: Display search results when available
+                        searchResults.map((product) => (
+                            <React.Fragment key={product.id}>
+                                <table className="items-center w-full bg-transparent border-collapse">
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Title
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Description
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Image
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Price
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Action
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr key={product.id}>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {product.title}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {product.description}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                <img
+                                                    className="w-full object-cover object-center"
+                                                    src={product.image}
+                                                    alt={product.title}
+                                                />
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {product.price}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                <Link href={`/dashboard/products/${product.id}`}>
+                                                    <Button color="blue" className="items-center gap-3">
+                                                        <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
+                                                    </Button>
+                                                </Link>
+
+                                                <Button color="red" className="items-center gap-3" onClick={() => del(product.id)}>
+                                                    <TrashIcon strokeWidth={2} className="h-4 w-4" />
+                                                </Button>
+
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+
+
+                                </table>
+                                <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
+                                    {renderPaginationSearch()}
+                                </CardFooter>
+                            </React.Fragment>
+                        ))
+                    ) : (
+                        products.map((product) => (
+                            <React.Fragment key={product.id}>
+                                <table className="items-center w-full bg-transparent border-collapse">
+                                    <thead>
+                                        <tr>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Title
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Description
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Image
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Price
+                                            </th>
+                                            <th
+                                                className={
+                                                    "px-6 align-middle border border-solid py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left " +
+                                                    (color === "light"
+                                                        ? "bg-blueGray-50 text-blueGray-500 border-blueGray-100"
+                                                        : "bg-blueGray-600 text-blueGray-200 border-blueGray-500")
+                                                }
+                                            >
+                                                Action
+                                            </th>
+
+                                        </tr>
+                                    </thead>
+
+                                    <tbody>
+                                        <tr key={product.id}>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {product.title}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {product.description}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                <img
+                                                    className="w-full object-cover object-center"
+                                                    src={product.image}
+                                                    alt={product.title}
+                                                />
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                {product.price}
+                                            </td>
+                                            <td className="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4">
+                                                <Link href={`/dashboard/products/${product.id}`}>
+                                                    <Button color="blue" className="items-center gap-3">
+                                                        <PencilSquareIcon strokeWidth={2} className="h-4 w-4" />
+                                                    </Button>
+                                                </Link>
+
+                                                <Button color="red" className="items-center gap-3" onClick={() => del(product.id)}>
+                                                    <TrashIcon strokeWidth={2} className="h-4 w-4" />
+                                                </Button>
+
+                                            </td>
+
+                                        </tr>
+                                    </tbody>
+
+
+                                </table>
+                                <CardFooter className="flex items-center justify-between border-t border-blue-gray-50 p-4">
+                                    {renderPagination()}
+                                </CardFooter>
+                            </React.Fragment>
+
+                        ))
+                    )}
+                    <CreateProducts isOpen={isModalOpenCreate} onClose={closeModalCreate} />
+                    <NotificationDeleteDialog open={openDialog} handleOpenDelete={handleOpenDialog} handleConfirmDelete={handleConfirmDelete} />
                 </div>
             </div>
             <Dialog open={open} handler={handleOpen}>
@@ -737,8 +720,7 @@ export default function EditProducts({ color }) {
                     </DialogFooter>
                 </form>
             </Dialog>
-            <FooterAdmin />
-        </Layout>
+        </AdminWrapper>
     );
 }
 

@@ -2,7 +2,6 @@ import React from "react";
 import {
     Button,
     Dialog,
-    DialogHeader,
     DialogBody,
     DialogFooter,
     Typography,
@@ -11,38 +10,48 @@ import {
 export function NotificationDeleteDialog({ open, handleOpenDelete, handleConfirmDelete }) {
     return (
         <>
-            <Dialog open={open} handler={handleOpenDelete}>
-                <DialogHeader>
-                    <Typography variant="h5" color="blue-gray">
-                        Your Attention is Required!
-                    </Typography>
-                </DialogHeader>
-                <DialogBody divider className="grid place-items-center gap-4">
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                        className="h-16 w-16 text-red-500"
-                    >
-                        <path
-                            fillRule="evenodd"
-                            d="M5.25 9a6.75 6.75 0 0113.5 0v.75c0 2.123.8 4.057 2.118 5.52a.75.75 0 01-.297 1.206c-1.544.57-3.16.99-4.831 1.243a3.75 3.75 0 11-7.48 0 24.585 24.585 0 01-4.831-1.244.75.75 0 01-.298-1.205A8.217 8.217 0 005.25 9.75V9zm4.502 8.9a2.25 2.25 0 104.496 0 25.057 25.057 0 01-4.496 0z"
-                            clipRule="evenodd"
-                        />
-                    </svg>
-                    <Typography color="red" variant="h4">
-                        You should read this!
-                    </Typography>
-                    <Typography className="text-center font-normal">
-                        Delete this role?
-                    </Typography>
+            <Dialog open={open} handler={handleOpenDelete} className="bg-blueGray-800">
+                <DialogBody className="">
+                    <div className="flex justify-end">
+                        <svg
+                            xmlns="http://www.w3.org/2000/svg"
+                            viewBox="0 0 24 24"
+                            fill="currentColor"
+                            className="mr-3 h-5 w-5 text-white"
+                            onClick={handleOpenDelete}
+                        >
+                            <path
+                                fillRule="evenodd"
+                                d="M5.47 5.47a.75.75 0 011.06 0L12 10.94l5.47-5.47a.75.75 0 111.06 1.06L13.06 12l5.47 5.47a.75.75 0 11-1.06 1.06L12 13.06l-5.47 5.47a.75.75 0 01-1.06-1.06L10.94 12 5.47 6.53a.75.75 0 010-1.06z"
+                                clipRule="evenodd"
+                            />
+                        </svg>
+                    </div>
+
+                    <div className="grid place-content-center gap-4">
+                        <div className="flex justify-center">
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                strokeWidth={1.5}
+                                stroke="currentColor"
+                                className="h-16 w-16 text-red-500">
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
+                            </svg>
+                        </div>
+
+                        <Typography color="white" variant="h4">
+                            Are you sure you want to delete?
+                        </Typography>
+                    </div>
                 </DialogBody>
-                <DialogFooter className="space-x-2">
-                    <Button variant="text" color="blue-gray" onClick={handleOpenDelete}>
-                        No
+                <DialogFooter className="space-x-2 flex justify-center">
+                    <Button variant="filled" color="red" onClick={handleConfirmDelete}>
+                        Yes, i'm sure
                     </Button>
-                    <Button variant="gradient" onClick={handleConfirmDelete}>
-                        Yes
+                    <Button variant="outlined" color="white" onClick={handleOpenDelete}>
+                        No, cancel
                     </Button>
                 </DialogFooter>
             </Dialog>

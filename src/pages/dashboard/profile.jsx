@@ -101,6 +101,11 @@ const profile = () => {
             return;
         }
 
+        if (password.length < 6) {
+            setPasswordError('Password must be at least 6 characters long');
+            return;
+        }
+
         try {
             await http.put('/users/password', {
                 password,
