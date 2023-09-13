@@ -1,11 +1,12 @@
 import React from "react";
 import Link from "next/link";
+import { connect } from "react-redux";
 import { useRouter } from "next/router";
 
 import NotificationDropdown from "@/components/Dropdowns/NotificationDropdown.js";
 import UserDropdown from "@/components/Dropdowns/UserDropdown.js";
 
-export default function Sidebar() {
+const Sidebar = (props) => {
   const [collapseShow, setCollapseShow] = React.useState("hidden");
   const router = useRouter();
   return (
@@ -87,137 +88,237 @@ export default function Sidebar() {
             {/* Navigation */}
 
             <ul className="md:flex-col md:min-w-full flex flex-col list-none">
-              <li className="items-center">
-                <Link href="/dashboard"
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (router.pathname === "/dashboard"
-                      ? "text-sky-500 hover:text-sky-600"
-                      : "text-blueGray-700 hover:text-blueGray-500")
-                  }
-                >
+              {props.user && props.user.role.name === "Admin" ? (
+                <>
+                  <li className="items-center">
+                    <Link href="/dashboard"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname === "/dashboard"
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
 
-                  <i
-                    className={
-                      "fas fa-tv mr-2 text-sm " +
-                      (router.pathname === "/dashboard"
-                        ? "opacity-75"
-                        : "text-blueGray-300")
-                    }
-                  ></i>{" "}
-                  Dashboard
-                </Link>
-              </li>
+                      <i
+                        className={
+                          "fas fa-tv mr-2 text-sm " +
+                          (router.pathname === "/dashboard"
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Dashboard
+                    </Link>
+                  </li>
 
-              <li className="items-center">
-                <Link href="/dashboard/users"
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (router.pathname.indexOf("/dashboard/users") !== -1
-                      ? "text-sky-500 hover:text-sky-600"
-                      : "text-blueGray-700 hover:text-blueGray-500")
-                  }
-                >
+                  <li className="items-center">
+                    <Link href="/dashboard/users"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname.indexOf("/dashboard/users") !== -1
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
 
-                  <i
-                    className={
-                      "fas fa-user mr-2 text-sm " +
-                      (router.pathname.indexOf("/dashboard/users") !== -1
-                        ? "opacity-75"
-                        : "text-blueGray-300")
-                    }
-                  ></i>{" "}
-                  Users
-                </Link>
-              </li>
+                      <i
+                        className={
+                          "fas fa-user mr-2 text-sm " +
+                          (router.pathname.indexOf("/dashboard/users") !== -1
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Users
+                    </Link>
+                  </li>
 
-              <li className="items-center">
-                <Link href="/dashboard/roles"
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (router.pathname.indexOf("/dashboard/roles") !== -1
-                      ? "text-sky-500 hover:text-sky-600"
-                      : "text-blueGray-700 hover:text-blueGray-500")
-                  }
-                >
+                  <li className="items-center">
+                    <Link href="/dashboard/roles"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname.indexOf("/dashboard/roles") !== -1
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
 
-                  <i
-                    className={
-                      "fas fa-lock-open mr-2 text-sm " +
-                      (router.pathname.indexOf("/dashboard/roles") !== -1
-                        ? "opacity-75"
-                        : "text-blueGray-300")
-                    }
-                  ></i>{" "}
-                  Roles
-                </Link>
-              </li>
+                      <i
+                        className={
+                          "fas fa-lock-open mr-2 text-sm " +
+                          (router.pathname.indexOf("/dashboard/roles") !== -1
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Roles
+                    </Link>
+                  </li>
 
-              <li className="items-center">
-                <Link href="/dashboard/products"
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (router.pathname.indexOf("/dashboard/products") !== -1
-                      ? "text-sky-500 hover:text-sky-600"
-                      : "text-blueGray-700 hover:text-blueGray-500")
-                  }
-                >
+                  <li className="items-center">
+                    <Link href="/dashboard/products"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname.indexOf("/dashboard/products") !== -1
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
 
-                  <i
-                    className={
-                      "fas fa-store mr-2 text-sm " +
-                      (router.pathname.indexOf("/dashboard/products") !== -1
-                        ? "opacity-75"
-                        : "text-blueGray-300")
-                    }
-                  ></i>{" "}
-                  Products
-                </Link>
-              </li>
+                      <i
+                        className={
+                          "fas fa-store mr-2 text-sm " +
+                          (router.pathname.indexOf("/dashboard/products") !== -1
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Products
+                    </Link>
+                  </li>
 
-              <li className="items-center">
-                <Link href="/dashboard/orders"
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (router.pathname.indexOf("/dashboard/orders") !== -1
-                      ? "text-sky-500 hover:text-sky-600"
-                      : "text-blueGray-700 hover:text-blueGray-500")
-                  }
-                >
+                  <li className="items-center">
+                    <Link href="/dashboard/orders"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname.indexOf("/dashboard/orders") !== -1
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
 
-                  <i
-                    className={
-                      "fas fa-cart-shopping mr-2 text-sm " +
-                      (router.pathname.indexOf("/dashboard/orders") !== -1
-                        ? "opacity-75"
-                        : "text-blueGray-300")
-                    }
-                  ></i>{" "}
-                  Orders
-                </Link>
-              </li>
+                      <i
+                        className={
+                          "fas fa-cart-shopping mr-2 text-sm " +
+                          (router.pathname.indexOf("/dashboard/orders") !== -1
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Orders
+                    </Link>
+                  </li>
 
-              <li className="items-center">
-                <Link href="/dashboard/settings"
-                  className={
-                    "text-xs uppercase py-3 font-bold block " +
-                    (router.pathname.indexOf("/dashboard/settings") !== -1
-                      ? "text-sky-500 hover:text-sky-600"
-                      : "text-blueGray-700 hover:text-blueGray-500")
-                  }
-                >
+                  <li className="items-center">
+                    <Link href="/dashboard/settings"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname.indexOf("/dashboard/settings") !== -1
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
 
-                  <i
-                    className={
-                      "fas fa-tools mr-2 text-sm " +
-                      (router.pathname.indexOf("/dashboard/settings") !== -1
-                        ? "opacity-75"
-                        : "text-blueGray-300")
-                    }
-                  ></i>{" "}
-                  Settings
-                </Link>
-              </li>
+                      <i
+                        className={
+                          "fas fa-tools mr-2 text-sm " +
+                          (router.pathname.indexOf("/dashboard/settings") !== -1
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Settings
+                    </Link>
+                  </li>
+                </>
+              ) : props.user && props.user.role.name === "Moderator" ? (
+                <>
+                  <li className="items-center">
+                    <Link href="/dashboard"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname === "/dashboard"
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
+
+                      <i
+                        className={
+                          "fas fa-tv mr-2 text-sm " +
+                          (router.pathname === "/dashboard"
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Dashboard
+                    </Link>
+                  </li>
+                  <li className="items-center">
+                    <Link href="/dashboard/products"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname.indexOf("/dashboard/products") !== -1
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
+
+                      <i
+                        className={
+                          "fas fa-store mr-2 text-sm " +
+                          (router.pathname.indexOf("/dashboard/products") !== -1
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Products
+                    </Link>
+                  </li>
+
+                  <li className="items-center">
+                    <Link href="/dashboard/orders"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname.indexOf("/dashboard/orders") !== -1
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
+
+                      <i
+                        className={
+                          "fas fa-cart-shopping mr-2 text-sm " +
+                          (router.pathname.indexOf("/dashboard/orders") !== -1
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Orders
+                    </Link>
+                  </li>
+
+                  <li className="items-center">
+                    <Link href="/dashboard/settings"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname.indexOf("/dashboard/settings") !== -1
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
+
+                      <i
+                        className={
+                          "fas fa-tools mr-2 text-sm " +
+                          (router.pathname.indexOf("/dashboard/settings") !== -1
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Settings
+                    </Link>
+                  </li>
+                </>
+              ) : (
+
+                <>
+
+                </>
+
+              )}
+
 
             </ul>
           </div>
@@ -226,3 +327,11 @@ export default function Sidebar() {
     </>
   );
 }
+
+export default connect(
+  (state) => {
+    return {
+      user: state.user.user
+    }
+  }
+)(Sidebar);
