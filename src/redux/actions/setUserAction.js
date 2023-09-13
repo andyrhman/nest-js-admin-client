@@ -1,6 +1,6 @@
 export const setUser = (user) => {
-  return (
-    type,
+  return {
+    type: 'SET_USER',
     user
-  )
+  }
 }

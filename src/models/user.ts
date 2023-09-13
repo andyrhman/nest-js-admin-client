@@ -1,19 +1,10 @@
+import { Role } from "./role";
+
 export class User {
     constructor(
         public id = '',
         public username = '',
-        public email = ''
+        public email = '',
+        public role = new Role()
     ) {}
-
-    get user_name(){
-        return this.username;
-    }
-
-    get user_email(){
-        return this.email;
-    }
-
-    // get name(){
-    //     return this.first_name + ' ' + this.last_name;
-    // }
 }

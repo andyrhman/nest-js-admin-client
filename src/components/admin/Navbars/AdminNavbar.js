@@ -1,45 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { connect } from "react-redux";
 import UserDropdown from "@/components/Dropdowns/UserDropdown.js";
-import { useRouter } from "next/router";
-import axios from "axios";
-import { User } from "@/models/user";
 
-const Navbar = () => {
-  // Getting the user data
-  const [user, setUser] = useState(new User());
-  const [error, setError] = useState('');
-  const router = useRouter();
-  useEffect(() => {
-
-    (
-      async () => {
-        try {
-          const { data } = await axios.get('user');
-          setUser(new User(
-            data.id,
-            data.username,
-            data.email
-          ));
-        } catch (error) {
-          if (error.response && error.response.status === 401) {
-            setError('Authentication Error');
-            router.push('/login');
-          }
-
-          if (error.response && error.response.status === 403) {
-            setError('Authentication Error');
-            router.push('/login');
-          }
-        }
-      }
-    )();
-
-  }, [])
-
+const Navbar = (props) => {
 
   return (
     <>
-      <nav className="absolute top-0 left-0 w-full z-10 bg-blueGray-800 md:flex-row md:flex-nowrap md:justify-start flex items-center p-4">
+      <nav className="absolute top-0 left-0 w-full z-10 bg-gradient-to-r from-indigo-500 from-10% via-sky-500 via-30% to-emerald-500 to-90% md:flex-row md:flex-nowrap md:justify-start flex items-center p-4">
         <div className="w-full mx-autp items-center flex justify-between md:flex-nowrap flex-wrap md:px-10 px-4">
           {/* Brand */}
           <a
@@ -57,7 +24,7 @@ const Navbar = () => {
               href="#pablo"
               onClick={(e) => e.preventDefault()}
             >
-              {user.user_email}
+              {props.user && props.user.username}
             </a>
             <UserDropdown />
           </ul>
@@ -66,5 +33,11 @@ const Navbar = () => {
     </>
   );
 }
-
-export default Navbar;
+// * https://www.phind.com/search?cache=yh923hlxiaeeipq2fv0952d1
+export default connect(
+  (state) => {
+    return {
+      user: state.user.user
+    }
+  }
+)(Navbar);

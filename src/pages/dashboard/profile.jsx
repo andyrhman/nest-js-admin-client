@@ -4,14 +4,12 @@ import { Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 // * Components
-import AdminNavbar from "@/components/admin/Navbars/AdminNavbar.js";
-import Sidebar from "@/components/admin/Sidebar/Sidebar.js";
-import FooterAdmin from "@/components/admin/Footers/FooterAdmin.js";
-import Layout from "@/components/Layout";
-import AuthenticationService from '@/services/AuthenticationService';
 import http from '@/services/Api';
+import AdminWrapper from '@/components/admin/AdminWrapper';
+import { setUser } from '@/redux/actions/setUserAction';
+import { connect } from 'react-redux';
 
-const profile = () => {
+const profile = (props) => {
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
@@ -29,10 +27,8 @@ const profile = () => {
         (
             async () => {
                 try {
-                    const { data } = await http.get('/user');
-
-                    setUsername(data.username);
-                    setEmail(data.email);
+                    setUsername(props.user.username);
+                    setEmail(props.user.email);
                 } catch (error) {
                     if (error.response && error.response.status === 401) {
                         setError('An error occurred');
@@ -43,7 +39,7 @@ const profile = () => {
             }
         )();
 
-    }, []);
+    }, [props.user]);
 
     const infoSubmit = async (e) => {
         e.preventDefault();
@@ -52,9 +48,16 @@ const profile = () => {
         setError('');
 
         try {
-            await http.put('/users/info', {
+            const {data} = await http.put('/users/info', {
                 username,
                 email
+            });
+
+            props.setUser({
+                id: data.id,
+                username: data.username,
+                email: data.email,
+                role: data.role
             });
             // Show a success message using React Toastify
             toast.success('Info Updated Successfully!.', {
@@ -198,135 +201,133 @@ const profile = () => {
     }
 
     return (
-        <Layout>
-            <Sidebar />
-            <div className="relative md:ml-64">
-                <AdminNavbar />
-                <div className="relative md:pt-32 pb-32 pt-12">
-                    <div className="px-4 md:px-10 mx-auto w-full">
+        <AdminWrapper>
+            <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded light bg-white" >
+                <div className="rounded-t mb-0 px-4 py-3 border-0">
+                    <div className="flex w-full flex-col gap-2">
+                        <form onSubmit={infoSubmit}>
+                            {error && (
+                                <Alert color="red" className="mt-2 text-center font-normal">
+                                    {error}
+                                </Alert>
+                            )}
 
-                        <div className="flex flex-wrap">
-
-                            <div className="flex w-full flex-col gap-2">
-                                <form onSubmit={infoSubmit}>
-                                    {error && (
-                                        <Alert color="red" className="mt-2 text-center font-normal">
-                                            {error}
-                                        </Alert>
-                                    )}
-
-                                    <Typography color="blue-gray" variant='h4'>
-                                        Account Information
-                                    </Typography>
-                                    <div className="mt-2">
-                                        <Typography color="blue-gray" variant='small'>
-                                            Username
-                                        </Typography>
-                                        <Input
-                                            color="blue"
-                                            defaultValue={username}
-                                            icon={<i className="fa-solid fa-signature" />}
-                                            required
-                                            error={!!usernameError} // Pass the error state as a prop
-                                            onChange={(e) => setUsername(e.target.value)}                                          
-                                        />
-                                        {usernameError && <div className="text-red-500 text-xs mt-1">{usernameError}</div>}
-                                    </div>
-                                    <div className="mt-2">
-                                        <Typography color="blue-gray" variant='small'>
-                                            Email
-                                        </Typography>
-                                        <Input
-                                            color="blue"
-                                            type='email'
-                                            defaultValue={email}
-                                            icon={<i className="fa-solid fa-envelope" />}
-                                            required
-                                            error={!!emailError} // Pass the error state as a prop
-                                            onChange={(e) => setEmail(e.target.value)}                                         
-                                        />
-                                        {emailError && <div className="text-red-500 text-xs mt-1">{emailError}</div>}
-                                    </div>
-                                    <div className='mt-2'>
-                                        <Button type='submit' className="flex items-center gap-3" size="md" color='green' variant='outlined'>
-                                            <i className="fa-solid fa-floppy-disk" /> Save
-                                        </Button>
-                                    </div>
-                                </form>
-
+                            <Typography color="blue-gray" variant='h4'>
+                                Account Information
+                            </Typography>
+                            <div className="mt-2">
+                                <Typography color="blue-gray" variant='small'>
+                                    Username
+                                </Typography>
+                                <Input
+                                    color="blue"
+                                    defaultValue={username}
+                                    icon={<i className="fa-solid fa-signature" />}
+                                    required
+                                    error={!!usernameError} // Pass the error state as a prop
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                                {usernameError && <div className="text-red-500 text-xs mt-1">{usernameError}</div>}
                             </div>
+                            <div className="mt-2">
+                                <Typography color="blue-gray" variant='small'>
+                                    Email
+                                </Typography>
+                                <Input
+                                    color="blue"
+                                    type='email'
+                                    defaultValue={email}
+                                    icon={<i className="fa-solid fa-envelope" />}
+                                    required
+                                    error={!!emailError} // Pass the error state as a prop
+                                    onChange={(e) => setEmail(e.target.value)}
+                                />
+                                {emailError && <div className="text-red-500 text-xs mt-1">{emailError}</div>}
+                            </div>
+                            <div className='mt-2'>
+                                <Button type='submit' className="flex items-center gap-3" size="md" color='green' variant='outlined'>
+                                    <i className="fa-solid fa-floppy-disk" /> Save
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                    <div className="flex w-full flex-col gap-2 mt-16">
+                        <form onSubmit={passwordSubmit}>
+                            <Typography color="blue-gray" variant='h4'>
+                                Change Password
+                            </Typography>
+                            <div className='mt-2'>
+                                <Input
+                                    size="lg"
+                                    label="Password"
+                                    type="password"
+                                    required
+                                    error={!!passwordError} // Pass the error state as a prop
+                                    onChange={(e) => validatePassword(e.target.value)}
+                                />
+                                <div style={{
+                                    fontSize: '12px',
+                                    textAlign: 'right',
+                                    color: strengthBarColor(),
+                                }}>
+                                    {strengthText()}
+                                </div>
+                                <div style={{
+                                    height: '10px',
+                                    width: `${strength * 20}%`,
+                                    backgroundColor: strengthBarColor(),
+                                    transition: 'width 0.3s ease-in-out',
+                                }} />
+                                {passwordError && <div className="text-red-500 text-xs mt-1">{passwordError}</div>}
+                            </div>
+                            <div className="mt-2">
+                                <Typography color="blue-gray" variant='small'>
+                                    Confirm Password
+                                </Typography>
+                                <div className='mb-5'>
+                                    <Input
+                                        size="lg"
+                                        label="Confirm Password"
+                                        type="password"
+                                        required
+                                        error={!!confirmPasswordError} // Pass the error state as a prop
+                                        onChange={(e) => validateConfirmPassword(e.target.value)}
 
-
-                            <div className="flex w-full flex-col gap-2 mt-16">
-                                <form onSubmit={passwordSubmit}>
-                                    <Typography color="blue-gray" variant='h4'>
-                                        Change Password
-                                    </Typography>
-                                    <div className='mt-2'>
-                                        <Input
-                                            size="lg"
-                                            label="Password"
-                                            type="password"
-                                            required
-                                            error={!!passwordError} // Pass the error state as a prop
-                                            onChange={(e) => validatePassword(e.target.value)}
-                                        />
-                                        <div style={{
-                                            fontSize: '12px',
-                                            textAlign: 'right',
-                                            color: strengthBarColor(),
-                                        }}>
-                                            {strengthText()}
-                                        </div>
-                                        <div style={{
-                                            height: '10px',
-                                            width: `${strength * 20}%`,
-                                            backgroundColor: strengthBarColor(),
-                                            transition: 'width 0.3s ease-in-out',
-                                        }} />
-                                        {passwordError && <div className="text-red-500 text-xs mt-1">{passwordError}</div>}
-                                    </div>
-                                    <div className="mt-2">
-                                        <Typography color="blue-gray" variant='small'>
-                                            Confirm Password
-                                        </Typography>
-                                        <div className='mb-5'>
-                                            <Input
-                                                size="lg"
-                                                label="Confirm Password"
-                                                type="password"
-                                                required
-                                                error={!!confirmPasswordError} // Pass the error state as a prop
-                                                onChange={(e) => validateConfirmPassword(e.target.value)}
-
-                                            />
-                                            {confirmPasswordError && <div className="text-red-500 text-xs mt-1">{confirmPasswordError}</div>}
-                                        </div>
-                                    </div>
-                                    <div className='mt-2'>
-                                        <div className='flex'>
-                                            <Button type='submit' className="flex items-center gap-3" size="md" color='green' variant='outlined'>
-                                                <i className="fa-solid fa-floppy-disk" /> Save
-                                            </Button>
-                                            {/* <Button className="flex items-center gap-3 ml-4" size="md" color='red'>
+                                    />
+                                    {confirmPasswordError && <div className="text-red-500 text-xs mt-1">{confirmPasswordError}</div>}
+                                </div>
+                            </div>
+                            <div className='mt-2'>
+                                <div className='flex'>
+                                    <Button type='submit' className="flex items-center gap-3" size="md" color='green' variant='outlined'>
+                                        <i className="fa-solid fa-floppy-disk" /> Save
+                                    </Button>
+                                    {/* <Button className="flex items-center gap-3 ml-4" size="md" color='red'>
                                         <i class="fa-solid fa-floppy-disk" /> Save
                                     </Button> */}
-                                        </div>
-                                    </div>
-                                </form>
+                                </div>
                             </div>
-
-
-
-
-                        </div>
-
+                        </form>
                     </div>
                 </div>
+
             </div>
-            <FooterAdmin />
-        </Layout>
+
+        </AdminWrapper>
     )
 }
 
-export default profile
+const mapStateToProps = (state) => {
+    return {
+        user: state.user.user
+    }
+}
+
+
+const mapDispatchToProps = (dispatch) => {
+    return {
+        setUser: (user) => dispatch(setUser(user))
+    }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(profile);
