@@ -201,6 +201,28 @@ const Sidebar = (props) => {
                   </li>
 
                   <li className="items-center">
+                    <Link href="/dashboard/order-item"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname.indexOf("/dashboard/order-item") !== -1
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
+
+                      <i
+                        className={
+                          "fas fa-cart-shopping mr-2 text-sm " +
+                          (router.pathname.indexOf("/dashboard/order-item") !== -1
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Order Item
+                    </Link>
+                  </li>
+
+                  <li className="items-center">
                     <Link href="/dashboard/settings"
                       className={
                         "text-xs uppercase py-3 font-bold block " +
@@ -286,6 +308,28 @@ const Sidebar = (props) => {
                         }
                       ></i>{" "}
                       Orders
+                    </Link>
+                  </li>
+
+                  <li className="items-center">
+                    <Link href="/dashboard/order-item"
+                      className={
+                        "text-xs uppercase py-3 font-bold block " +
+                        (router.pathname.indexOf("/dashboard/order-item") !== -1
+                          ? "text-sky-500 hover:text-sky-600"
+                          : "text-blueGray-700 hover:text-blueGray-500")
+                      }
+                    >
+
+                      <i
+                        className={
+                          "fas fa-cart-shopping mr-2 text-sm " +
+                          (router.pathname.indexOf("/dashboard/order-item") !== -1
+                            ? "opacity-75"
+                            : "text-blueGray-300")
+                        }
+                      ></i>{" "}
+                      Order Item
                     </Link>
                   </li>
 
