@@ -1,5 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Input, Typography, Button, Alert } from "@material-tailwind/react";
+import {
+    Input,
+    Typography,
+    Button,
+    Alert,
+    Accordion,
+    AccordionHeader,
+    AccordionBody,
+} from "@material-tailwind/react";
 import { Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -8,6 +16,26 @@ import http from '@/services/Api';
 import AdminWrapper from '@/components/admin/AdminWrapper';
 import { setUser } from '@/redux/actions/setUserAction';
 import { connect } from 'react-redux';
+
+function Icon({ id, open }) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={2}
+            stroke="currentColor"
+            className={`${id === open ? "rotate-180" : ""} h-5 w-5 transition-transform`}
+        >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" />
+        </svg>
+    );
+}
+
+const CUSTOM_ANIMATION = {
+    mount: { scale: 1 },
+    unmount: { scale: 0.9 },
+};
 
 const profile = (props) => {
 
@@ -48,7 +76,7 @@ const profile = (props) => {
         setError('');
 
         try {
-            const {data} = await http.put('/users/info', {
+            const { data } = await http.put('/users/info', {
                 username,
                 email
             });
@@ -57,7 +85,7 @@ const profile = (props) => {
                 id: data.id,
                 username: data.username,
                 email: data.email,
-                role: data.role
+                role: data.role || {}
             });
             // Show a success message using React Toastify
             toast.success('Info Updated Successfully!.', {
@@ -73,7 +101,7 @@ const profile = (props) => {
             });
             setTimeout(() => {
                 window.location.reload();
-            }, 3000);
+            }, 1000);
 
         } catch (error) {
             console.error(error.response);
@@ -200,120 +228,394 @@ const profile = (props) => {
         }
     }
 
+    // * Accordion
+    const [open, setOpen] = useState(0);
+    const [alwaysOpen, setAlwaysOpen] = useState(true);
+
+    const handleAlwaysOpen = () => setAlwaysOpen((cur) => !cur);
+    const handleOpen = (value) => setOpen(open === value ? 0 : value);
+
+    // * Open Address
+    const [openAddress, setOpenAddress] = useState(false);
+
+    const handleClick = () => {
+        setOpenAddress(current => !current);
+    };
+
+    // * Fetch the address
+    const [errorAddress, setErrorAddress] = useState('');
+
+    const [fetchStreet, setFetchStreet] = useState('');
+    const [fetchCountry, setFetchCountry] = useState('');
+    const [fetchProvince, setFetchProvince] = useState('');
+    const [fetchCity, setFetchCity] = useState('');
+    const [fetchZip, setFetchZip] = useState('');
+    const [fetchPhone, setFetchPhone] = useState('');
+
+
+    useEffect(() => {
+        (
+            async () => {
+                try {
+                    const { data } = await http.get('/address/user');
+
+                    setFetchStreet(data.street);
+                    setFetchCountry(data.country);
+                    setFetchProvince(data.province);
+                    setFetchCity(data.city);
+                    setFetchZip(data.zip);
+                    setFetchPhone(data.phone) // Convert string to number
+                } catch (errorAddress) {
+                    if (errorAddress.response && errorAddress.response.status === 404 && errorAddress.response.data.message) {
+                        const errorMessage = errorAddress.response.data.message;
+                        setErrorAddress(errorMessage);
+                    }
+                }
+
+            }
+        )();
+    }, []);
+
+    // * Create Address
+    const [street, setStreet] = useState('');
+    const [country, setCountry] = useState('');
+    const [province, setProvince] = useState('');
+    const [city, setCity] = useState('');
+    const [zip, setZip] = useState('');
+    const [phone, setPhone] = useState('');
+
+    const createAddress = async (e) => {
+        e.preventDefault();
+
+        try {
+            await http.post('/address', {
+                street,
+                country,
+                province,
+                city,
+                zip,
+                phone,
+            })
+            // Show a success message using React Toastify
+            toast.success('Address Created Successfully!.', {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: Slide
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+
+        } catch (error) {
+            console.error(error.response);
+            if (error.response && error.response.data && error.response.data.message) {
+                const errorMessage = error.response.data.message;
+                setError(errorMessage);
+            }
+        }
+    }
+
+    // * Update Address
+    const updateAddress = async (e) => {
+        e.preventDefault();
+
+        try {
+            await http.put('/address', {
+                street,
+                country,
+                province,
+                city,
+                zip,
+                phone,
+            })
+            // Show a success message using React Toastify
+            toast.success('Address Created Successfully!.', {
+                position: "top-center",
+                autoClose: 2000,
+                hideProgressBar: true,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                progress: undefined,
+                theme: "colored",
+                transition: Slide
+            });
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+
+        } catch (error) {
+            console.error(error.response);
+            if (error.response && error.response.data && error.response.data.message) {
+                const errorMessage = error.response.data.message;
+                setError(errorMessage);
+            }
+        }
+    }
+
     return (
         <AdminWrapper>
             <div className="relative flex flex-col min-w-0 break-words w-full mb-6 shadow-lg rounded light bg-white" >
                 <div className="rounded-t mb-0 px-4 py-3 border-0">
                     <div className="flex w-full flex-col gap-2">
-                        <form onSubmit={infoSubmit}>
-                            {error && (
-                                <Alert color="red" className="mt-2 text-center font-normal">
-                                    {error}
-                                </Alert>
-                            )}
 
-                            <Typography color="blue-gray" variant='h4'>
+                        {error && (
+                            <Alert color="red" className="mt-2 text-center font-normal">
+                                {error}
+                            </Alert>
+                        )}
+
+                        <Accordion open={alwaysOpen} icon={<Icon id={1} />} animate={CUSTOM_ANIMATION}>
+                            <AccordionHeader onClick={handleAlwaysOpen}>My Address</AccordionHeader>
+                            <AccordionBody>
+                                {fetchStreet ? (
+                                    <>
+                                        <form onSubmit={updateAddress}>
+                                            <div className='flex flex-col md:flex-row justify-between'>
+
+                                                <div className='w-full md:w-2/4 md:mr-8' >
+                                                    <div className='mb-6'>
+                                                        <Input
+                                                            label="Street"
+                                                            defaultValue={fetchStreet}
+                                                            onChange={(e) => setStreet(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className='mb-6'>
+                                                        <Input
+                                                            label="Country"
+                                                            defaultValue={fetchCountry}
+                                                            onChange={(e) => setCountry(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className='mb-6'>
+                                                        <Input
+                                                            label="Province"
+                                                            defaultValue={fetchProvince}
+                                                            onChange={(e) => setProvince(e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                                <div className='w-full md:w-2/4 md:mr-8' >
+                                                    <div className='mb-6'>
+                                                        <Input
+                                                            label="City"
+                                                            defaultValue={fetchCity}
+                                                            onChange={(e) => setCity(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className='mb-6'>
+                                                        <Input
+                                                            
+                                                            label="Zip Code"
+                                                            defaultValue={fetchZip}
+                                                            onChange={(e) => setZip(e.target.value)}
+                                                        />
+                                                    </div>
+                                                    <div className='mb-6'>
+                                                        <Input
+                                                            type='number'
+                                                            label="Phone"
+                                                            defaultValue={fetchPhone}
+                                                            onChange={(e) => setPhone(e.target.value)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <Button type='submit' className="flex items-center gap-3" size="sm" color='blue' variant='filled'>
+                                                <i className="fa-solid fa-floppy-disk" /> Submit
+                                            </Button>
+                                        </form>
+                                    </>
+                                ) : (
+                                    <>
+                                        {!openAddress && (
+
+                                            <div className='grid place-content-center gap-4'>
+
+                                                <Typography color="blue-gray" variant='h5'>
+                                                    Address Not Found
+                                                </Typography>
+
+                                                <Button onClick={handleClick} color='blue' variant='filled'>
+                                                    Create Address
+                                                </Button>
+                                            </div>
+
+                                        )}
+
+                                        {openAddress && (
+                                            <form onSubmit={createAddress}>
+                                                <div className='flex flex-col md:flex-row justify-between'>
+                                                    <div className='w-full md:w-2/4 md:mr-8' >
+                                                        <div className='mb-6'>
+                                                            <Input
+                                                                label="Street"
+                                                                onChange={(e) => setStreet(e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className='mb-6'>
+                                                            <Input
+                                                                label="Country"
+                                                                onChange={(e) => setCountry(e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className='mb-6'>
+                                                            <Input
+                                                                label="Province"
+                                                                onChange={(e) => setProvince(e.target.value)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                    <div className='w-full md:w-2/4 md:mr-8' >
+                                                        <div className='mb-6'>
+                                                            <Input
+                                                                label="City"
+                                                                onChange={(e) => setCity(e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className='mb-6'>
+                                                            <Input
+                                                                type='number'
+                                                                label="Zip Code"
+                                                                onChange={(e) => setZip(e.target.value)}
+                                                            />
+                                                        </div>
+                                                        <div className='mb-6'>
+                                                            <Input
+                                                                type='number'
+                                                                label="Phone"
+                                                                onChange={(e) => setPhone(e.target.value)}
+                                                            />
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <Button type='submit' className="flex items-center gap-3" size="sm" color='blue' variant='filled'>
+                                                    <i className="fa-solid fa-floppy-disk" /> Submit
+                                                </Button>
+                                            </form>
+                                        )}
+                                    </>
+                                )}
+
+
+
+                            </AccordionBody>
+                        </Accordion>
+                        <Accordion open={open === 2} icon={<Icon id={2} />} animate={CUSTOM_ANIMATION}>
+                            <AccordionHeader onClick={() => handleOpen(2)}>
                                 Account Information
-                            </Typography>
-                            <div className="mt-2">
-                                <Typography color="blue-gray" variant='small'>
-                                    Username
-                                </Typography>
-                                <Input
-                                    color="blue"
-                                    defaultValue={username}
-                                    icon={<i className="fa-solid fa-signature" />}
-                                    required
-                                    error={!!usernameError} // Pass the error state as a prop
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
-                                {usernameError && <div className="text-red-500 text-xs mt-1">{usernameError}</div>}
-                            </div>
-                            <div className="mt-2">
-                                <Typography color="blue-gray" variant='small'>
-                                    Email
-                                </Typography>
-                                <Input
-                                    color="blue"
-                                    type='email'
-                                    defaultValue={email}
-                                    icon={<i className="fa-solid fa-envelope" />}
-                                    required
-                                    error={!!emailError} // Pass the error state as a prop
-                                    onChange={(e) => setEmail(e.target.value)}
-                                />
-                                {emailError && <div className="text-red-500 text-xs mt-1">{emailError}</div>}
-                            </div>
-                            <div className='mt-2'>
-                                <Button type='submit' className="flex items-center gap-3" size="md" color='green' variant='outlined'>
-                                    <i className="fa-solid fa-floppy-disk" /> Save
-                                </Button>
-                            </div>
-                        </form>
-                    </div>
-                    <div className="flex w-full flex-col gap-2 mt-16">
-                        <form onSubmit={passwordSubmit}>
-                            <Typography color="blue-gray" variant='h4'>
-                                Change Password
-                            </Typography>
-                            <div className='mt-2'>
-                                <Input
-                                    size="lg"
-                                    label="Password"
-                                    type="password"
-                                    required
-                                    error={!!passwordError} // Pass the error state as a prop
-                                    onChange={(e) => validatePassword(e.target.value)}
-                                />
-                                <div style={{
-                                    fontSize: '12px',
-                                    textAlign: 'right',
-                                    color: strengthBarColor(),
-                                }}>
-                                    {strengthText()}
-                                </div>
-                                <div style={{
-                                    height: '10px',
-                                    width: `${strength * 20}%`,
-                                    backgroundColor: strengthBarColor(),
-                                    transition: 'width 0.3s ease-in-out',
-                                }} />
-                                {passwordError && <div className="text-red-500 text-xs mt-1">{passwordError}</div>}
-                            </div>
-                            <div className="mt-2">
-                                <Typography color="blue-gray" variant='small'>
-                                    Confirm Password
-                                </Typography>
-                                <div className='mb-5'>
-                                    <Input
-                                        size="lg"
-                                        label="Confirm Password"
-                                        type="password"
-                                        required
-                                        error={!!confirmPasswordError} // Pass the error state as a prop
-                                        onChange={(e) => validateConfirmPassword(e.target.value)}
+                            </AccordionHeader>
+                            <AccordionBody>
 
-                                    />
-                                    {confirmPasswordError && <div className="text-red-500 text-xs mt-1">{confirmPasswordError}</div>}
+                                <div className='flex flex-col md:flex-row justify-between'>
+                                    <div className='w-full md:w-2/4 md:mr-8' >
+                                        <form onSubmit={infoSubmit}>
+                                            <Typography color="blue-gray" variant='h4'>
+                                                Update Info
+                                            </Typography>
+                                            <Typography color="blue-gray" variant='small'>
+                                                Username
+                                            </Typography>
+                                            <Input
+                                                color="blue"
+                                                defaultValue={username}
+                                                icon={<i className="fa-solid fa-signature" />}
+                                                required
+                                                error={!!usernameError} // Pass the error state as a prop
+                                                onChange={(e) => setUsername(e.target.value)}
+                                            />
+                                            {usernameError && <div className="text-red-500 text-xs mt-1">{usernameError}</div>}
+                                            <Typography color="blue-gray" variant='small'>
+                                                Email
+                                            </Typography>
+                                            <Input
+                                                color="blue"
+                                                type='email'
+                                                defaultValue={email}
+                                                icon={<i className="fa-solid fa-envelope" />}
+                                                required
+                                                error={!!emailError} // Pass the error state as a prop
+                                                onChange={(e) => setEmail(e.target.value)}
+                                            />
+                                            {emailError && <div className="text-red-500 text-xs mt-1">{emailError}</div>}
+                                            <div className='mt-2'>
+                                                <Button type='submit' className="flex items-center gap-3" size="sm" color='blue' variant='filled'>
+                                                    <i className="fa-solid fa-floppy-disk" /> Save
+                                                </Button>
+                                            </div>
+
+                                        </form>
+                                    </div>
+                                    <div className='w-full md:w-2/4 md:mr-8' >
+                                        <form onSubmit={passwordSubmit}>
+                                            <Typography color="blue-gray" variant='h4'>
+                                                Change Password
+                                            </Typography>
+                                            <Typography color="blue-gray" variant='small'>
+                                                Password
+                                            </Typography>
+                                            <Input
+                                                label="Password"
+                                                type="password"
+                                                required
+                                                error={!!passwordError} // Pass the error state as a prop
+                                                onChange={(e) => validatePassword(e.target.value)}
+                                            />
+                                            <div style={{
+                                                fontSize: '12px',
+                                                textAlign: 'right',
+                                                color: strengthBarColor(),
+                                            }}>
+                                                {strengthText()}
+                                            </div>
+                                            <div style={{
+                                                height: '10px',
+                                                width: `${strength * 20}%`,
+                                                backgroundColor: strengthBarColor(),
+                                                transition: 'width 0.3s ease-in-out',
+                                            }} />
+                                            {passwordError && <div className="text-red-500 text-xs mt-1">{passwordError}</div>}
+
+                                            <Typography color="blue-gray" variant='small'>
+                                                Confirm Password
+                                            </Typography>
+
+                                            <Input
+                                                label="Confirm Password"
+                                                type="password"
+                                                required
+                                                error={!!confirmPasswordError} // Pass the error state as a prop
+                                                onChange={(e) => validateConfirmPassword(e.target.value)}
+
+                                            />
+                                            {confirmPasswordError && <div className="text-red-500 text-xs mt-1">{confirmPasswordError}</div>}
+
+                                            <div className='mt-2'>
+                                                <Button type='submit' className="flex items-center gap-3" size="sm" color='blue' variant='filled'>
+                                                    <i className="fa-solid fa-floppy-disk" /> Save
+                                                </Button>
+                                            </div>
+
+                                        </form>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className='mt-2'>
-                                <div className='flex'>
-                                    <Button type='submit' className="flex items-center gap-3" size="md" color='green' variant='outlined'>
-                                        <i className="fa-solid fa-floppy-disk" /> Save
-                                    </Button>
-                                    {/* <Button className="flex items-center gap-3 ml-4" size="md" color='red'>
-                                        <i class="fa-solid fa-floppy-disk" /> Save
-                                    </Button> */}
-                                </div>
-                            </div>
-                        </form>
+                            </AccordionBody>
+                        </Accordion>
+
                     </div>
+
                 </div>
 
             </div>
 
-        </AdminWrapper>
+        </AdminWrapper >
     )
 }
 

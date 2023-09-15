@@ -88,6 +88,8 @@ const Sidebar = (props) => {
             {/* Navigation */}
 
             <ul className="md:flex-col md:min-w-full flex flex-col list-none">
+              {/* {props.user && props.user.role && props.user.role.name === "Admin" ? (
+              ) : props.user && props.user.role && props.user.role.name === "Moderator" ? ( */}
               {props.user && props.user.role.name === "Admin" ? (
                 <>
                   <li className="items-center">
