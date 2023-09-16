@@ -51,7 +51,6 @@ const profile = (props) => {
     const [strength, setStrength] = useState(0);
 
     useEffect(() => {
-
         (
             async () => {
                 try {
@@ -63,10 +62,8 @@ const profile = (props) => {
                         router.push('/login');
                     }
                 }
-
             }
         )();
-
     }, [props.user]);
 
     const infoSubmit = async (e) => {
@@ -242,40 +239,6 @@ const profile = (props) => {
         setOpenAddress(current => !current);
     };
 
-    // * Fetch the address
-    const [errorAddress, setErrorAddress] = useState('');
-
-    const [fetchStreet, setFetchStreet] = useState('');
-    const [fetchCountry, setFetchCountry] = useState('');
-    const [fetchProvince, setFetchProvince] = useState('');
-    const [fetchCity, setFetchCity] = useState('');
-    const [fetchZip, setFetchZip] = useState('');
-    const [fetchPhone, setFetchPhone] = useState('');
-
-
-    useEffect(() => {
-        (
-            async () => {
-                try {
-                    const { data } = await http.get('/address/user');
-
-                    setFetchStreet(data.street);
-                    setFetchCountry(data.country);
-                    setFetchProvince(data.province);
-                    setFetchCity(data.city);
-                    setFetchZip(data.zip);
-                    setFetchPhone(data.phone) // Convert string to number
-                } catch (errorAddress) {
-                    if (errorAddress.response && errorAddress.response.status === 404 && errorAddress.response.data.message) {
-                        const errorMessage = errorAddress.response.data.message;
-                        setErrorAddress(errorMessage);
-                    }
-                }
-
-            }
-        )();
-    }, []);
-
     // * Create Address
     const [street, setStreet] = useState('');
     const [country, setCountry] = useState('');
@@ -321,7 +284,37 @@ const profile = (props) => {
         }
     }
 
+    // * Fetch the address
+    const [errorAddress, setErrorAddress] = useState('');
+
+    const [fetchAddress, setFetchAddress] = useState('');
+
+    useEffect(() => {
+        (
+            async () => {
+                try {
+                    const { data } = await http.get('/address/user');
+
+                    setFetchAddress(data.id);
+                    setStreet(data.street);
+                    setCountry(data.country);
+                    setProvince(data.province);
+                    setCity(data.city);
+                    setZip(data.zip);
+                    setPhone(data.phone) // Convert string to number
+                } catch (errorAddress) {
+                    if (errorAddress.response && errorAddress.response.status === 404 && errorAddress.response.data.message) {
+                        const errorMessage = errorAddress.response.data.message;
+                        setErrorAddress(errorMessage);
+                    }
+                }
+
+            }
+        )();
+    }, []);
+
     // * Update Address
+
     const updateAddress = async (e) => {
         e.preventDefault();
 
@@ -374,7 +367,7 @@ const profile = (props) => {
                         <Accordion open={alwaysOpen} icon={<Icon id={1} />} animate={CUSTOM_ANIMATION}>
                             <AccordionHeader onClick={handleAlwaysOpen}>My Address</AccordionHeader>
                             <AccordionBody>
-                                {fetchStreet ? (
+                                {fetchAddress ? (
                                     <>
                                         <form onSubmit={updateAddress}>
                                             <div className='flex flex-col md:flex-row justify-between'>
@@ -382,22 +375,22 @@ const profile = (props) => {
                                                 <div className='w-full md:w-2/4 md:mr-8' >
                                                     <div className='mb-6'>
                                                         <Input
-                                                            label="Street"
-                                                            defaultValue={fetchStreet}
+                                                            label='Street'
+                                                            defaultValue={street}
                                                             onChange={(e) => setStreet(e.target.value)}
                                                         />
                                                     </div>
                                                     <div className='mb-6'>
                                                         <Input
-                                                            label="Country"
-                                                            defaultValue={fetchCountry}
+                                                            label='Country'
+                                                            defaultValue={country}
                                                             onChange={(e) => setCountry(e.target.value)}
                                                         />
                                                     </div>
                                                     <div className='mb-6'>
                                                         <Input
-                                                            label="Province"
-                                                            defaultValue={fetchProvince}
+                                                            label='Province'
+                                                            defaultValue={province}
                                                             onChange={(e) => setProvince(e.target.value)}
                                                         />
                                                     </div>
@@ -405,24 +398,22 @@ const profile = (props) => {
                                                 <div className='w-full md:w-2/4 md:mr-8' >
                                                     <div className='mb-6'>
                                                         <Input
-                                                            label="City"
-                                                            defaultValue={fetchCity}
+                                                            label='City'
+                                                            defaultValue={city}
                                                             onChange={(e) => setCity(e.target.value)}
                                                         />
                                                     </div>
                                                     <div className='mb-6'>
                                                         <Input
-                                                            
-                                                            label="Zip Code"
-                                                            defaultValue={fetchZip}
+                                                            label='Zip Code'
+                                                            defaultValue={zip}
                                                             onChange={(e) => setZip(e.target.value)}
                                                         />
                                                     </div>
                                                     <div className='mb-6'>
                                                         <Input
-                                                            type='number'
-                                                            label="Phone"
-                                                            defaultValue={fetchPhone}
+                                                            label='Phone'
+                                                            defaultValue={phone}
                                                             onChange={(e) => setPhone(e.target.value)}
                                                         />
                                                     </div>
@@ -431,6 +422,7 @@ const profile = (props) => {
                                             <Button type='submit' className="flex items-center gap-3" size="sm" color='blue' variant='filled'>
                                                 <i className="fa-solid fa-floppy-disk" /> Submit
                                             </Button>
+
                                         </form>
                                     </>
                                 ) : (
