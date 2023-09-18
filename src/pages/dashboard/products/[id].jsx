@@ -28,6 +28,7 @@ import 'react-toastify/dist/ReactToastify.css';
 
 import { NotificationDeleteDialog } from "@/components/admin/modals/delete.modal";
 import CreateProducts from "./create.products";
+import MultipleImageUploads from "@/components/admin/uploads/MultipleImagesUpload";
 import ImageUploads from "@/components/admin/uploads/ImageUploads";
 
 export default function EditProducts({ color }) {
@@ -51,7 +52,13 @@ export default function EditProducts({ color }) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [image, setImage] = useState('');
+    const [images, setImages] = useState([]); // additional images
     const [price, setPrice] = useState('');
+
+    const addImages = (urls) => {
+        setImages(prevImages => [...prevImages, ...urls]);
+    }
+
 
     const ref = useRef(null);
 
@@ -94,6 +101,7 @@ export default function EditProducts({ color }) {
                 title,
                 description,
                 image,
+                images,
                 price
             });
             if (data) {
@@ -696,6 +704,18 @@ export default function EditProducts({ color }) {
                                     onChange={(e) => setImage(e.target.value)}
                                 />
                                 <ImageUploads uploaded={updateImage} />
+                            </div>
+
+                            <div className="mb-5">
+                                <Typography color="blue-gray" className="font-medium mb-2">
+                                    Choose multiple images
+                                </Typography>
+                                <MultipleImageUploads uploaded={addImages} />
+                                <textarea
+                                    value={images.join('\n')}
+                                    onChange={(e) => setImages(e.target.value)}
+                                    readOnly
+                                />
                             </div>
 
                             <div className="mb-5">

@@ -11,6 +11,7 @@ import {
     Textarea
 } from "@material-tailwind/react";
 import ImageUploads from "@/components/admin/uploads/ImageUploads";
+import MultipleImageUploads from "@/components/admin/uploads/MultipleImagesUpload";
 import { Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import http from "@/services/Api";
@@ -19,9 +20,14 @@ const CreateProducts = ({ isOpen, onClose }) => {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
     const [image, setImage] = useState('');
+    const [images, setImages] = useState([]); // additional images
     const [price, setPrice] = useState('');
 
     const [error, setError] = useState('');
+
+    const addImages = (urls) => {
+        setImages(prevImages => [...prevImages, ...urls]);
+    }
 
     const submit = async (e) => {
         e.preventDefault();
@@ -32,6 +38,7 @@ const CreateProducts = ({ isOpen, onClose }) => {
                 title,
                 description,
                 image,
+                images,
                 price
             });
             if (data) {
@@ -113,11 +120,23 @@ const CreateProducts = ({ isOpen, onClose }) => {
                                 <Typography color="blue-gray" className="font-medium mb-2">
                                     Choose a image
                                 </Typography>
-                                <input 
-                                value={image} 
-                                onChange={(e) => setImage(e.target.value)}
+                                <input
+                                    value={image}
+                                    onChange={(e) => setImage(e.target.value)}
                                 />
-                                <ImageUploads uploaded={setImage}/>
+                                <ImageUploads uploaded={setImage} />
+                            </div>
+
+                            <div className="mb-5">
+                                <Typography color="blue-gray" className="font-medium mb-2">
+                                    Choose multiple images
+                                </Typography>
+                                <MultipleImageUploads uploaded={addImages} />
+                                <textarea
+                                    value={images.join('\n')}
+                                    onChange={(e) => setImages(e.target.value)}
+                                    readOnly
+                                />
                             </div>
 
                             <div className="mb-5">
