@@ -64,9 +64,9 @@ const AdminWrapper = (props) => {
                             {props.children}
                         </div>
                     </div>
+                    <FooterAdmin />
                 </div>
             </div>
-            <FooterAdmin />
         </Layout>
     )
 }

@@ -42,7 +42,7 @@ function ShopIndex() {
                         {products.map((p) => (
                             <React.Fragment key={p.id}>
                                 <Link
-                                    href={`/products/${p.id}`}
+                                    href={`/shop/products/${p.slug}`}
                                     passHref
                                 >
                                     <div className="h-72 border-b-2 border-palette-lighter relative">

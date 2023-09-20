@@ -10,7 +10,7 @@ import {
 export function NotificationDeleteDialog({ open, handleOpenDelete, handleConfirmDelete }) {
     return (
         <>
-            <Dialog open={open} handler={handleOpenDelete} className="bg-blueGray-800">
+            <Dialog open={open} handler={handleOpenDelete} className="bg-slate-900">
                 <DialogBody className="">
                     <div className="flex justify-end">
                         <svg
