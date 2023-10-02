@@ -1,8 +1,30 @@
+import React, { useEffect, useState } from 'react'
 import Link from 'next/link'
+import axios from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons'
 
 function Nav() {
+
+  const [totalItem, setTotalItem] = useState(0)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+
+    (
+      async () => {
+        try {
+          const { data } = await axios.get('order-user')
+          setTotalItem(data.total_orders)
+        } catch (error) {
+          if (error.response && error.response.status === 400) {
+            setError('Products Not Found');
+          }
+        }
+      }
+    )();
+  }, [])
+
 
   return (
     <header className="border-b border-palette-lighter sticky top-0 z-20 bg-white">
@@ -17,16 +39,21 @@ function Nav() {
         </Link>
         <div>
           <Link
-            href="/cart"
+            href="/shop/cart"
             passHref
             className="relative"
           >
             <FontAwesomeIcon className="text-purple-700 w-6 m-auto" icon={faShoppingCart} />
-            <div
-              className="absolute top-0 right-0 text-xs bg-yellow-300 text-gray-900 font-semibold rounded-full py-1 px-2 transform translate-x-10 -translate-y-3"
-            >
-              item
-            </div>
+            {totalItem === 0
+              ? null
+              : (
+                <div
+                  className="absolute top-0 right-0 text-xs bg-yellow-300 text-gray-900 font-semibold rounded-full py-1 px-2 transform translate-x-10 -translate-y-3"
+                >
+                  {totalItem}
+                </div>
+            )}
+
           </Link>
         </div>
       </div>

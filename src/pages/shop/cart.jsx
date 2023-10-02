@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from 'react'
+import axios from 'axios'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import Link from 'next/link'
@@ -9,6 +11,27 @@ import PageTitle from '@/components/shop/PageTitle'
 import BackToProductButton from '@/components/shop/BackToProductButton'
 
 function CartPage() {
+
+  const [orderItem, setOrderItem] = useState([])
+  const [total, setTotal] = useState('')
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+
+    (
+      async () => {
+        try {
+          const { data } = await axios.get('order-user')
+          setOrderItem(data.order_items)
+          setTotal(data.total)
+        } catch (error) {
+          if (error.response && error.response.status === 400) {
+            setError('Products Not Found');
+          }
+        }
+      }
+    )();
+  }, [])
 
   return (
     <div className="flex flex-col justify-between min-h-screen">
@@ -28,60 +51,62 @@ function CartPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-palette-lighter">
-                <tr className="text-sm sm:text-base text-gray-600 text-center">
-                  <td className="font-primary font-medium px-4 sm:px-6 py-4 flex items-center">
-                    <img
-                      src="https://doggystickers.vercel.app/_next/image?url=https%3A%2F%2Fcdn.shopify.com%2Fs%2Ffiles%2F1%2F2800%2F2014%2Fproducts%2Fmockup-fc750eaa.jpg%3Fv%3D1616988549&w=1920&q=75"
-                      alt="Image"
-                      height={64}
-                      width={64}
-                      className={`hidden sm:inline-flex`}
-                    />
-                    <Link
-                      passHref
-                      href={`/products/123`}
-                      className="pt-1 hover:text-palette-dark"
-                    >
-                      Test, 2 x 3
-                    </Link>
-                  </td>
-                  <td className="font-primary font-medium px-4 sm:px-6 py-4">
-                    <input
-                      type="number"
-                      inputMode="numeric"
-                      id="variant-quantity"
-                      name="variant-quantity"
-                      min="1"
-                      step="1"
-                      // value={item.variantQuantity}
-                      // onChange={(e) => updateItem(item.variantId, e.target.value)}
-                      className="text-gray-900 form-input border border-gray-300 w-16 rounded-sm focus:border-palette-light focus:ring-palette-light"
-                    />
-                  </td>
-                  <td className="font-primary text-base font-light px-4 sm:px-6 py-4 hidden sm:table-cell">
-                    <Price
-                      currency="$"
-                      num="200"
-                      numSize="text-lg"
-                    />
-                  </td>
-                  <td className="font-primary font-medium px-4 sm:px-6 py-4">
-                    <button
-                      aria-label="delete-item"
-                      className=""
-                    // onClick={() => updateItem(item.variantId, 0)}
-                    >
-                      <FontAwesomeIcon icon={faTimes} className="w-8 h-8 text-purple-700 border border-purple-700 p-1 hover:bg-palette-lighter" />
-                    </button>
-                  </td>
-                </tr>
+
+                {orderItem?.map((o) => (
+                  <tr className="text-sm sm:text-base text-gray-600 text-center" key={o.id}>
+                    <td className="font-primary font-medium px-4 sm:px-6 py-4 flex items-center">
+                      <img
+                        src={o.product.image}
+                        alt="Image"
+                        height={64}
+                        width={64}
+                        className={`hidden sm:inline-flex`}
+                      />
+                      <Link
+                        passHref
+                        href={`/shop/products/${o.product.slug}`}
+                        className="pt-1 hover:text-palette-dark"
+                      >
+                        {o.product_title}
+                      </Link>
+                    </td>
+                    <td className="font-primary font-medium px-4 sm:px-6 py-4">
+                      <input
+                        type="number"
+                        inputMode="numeric"
+                        name="variant-quantity"
+                        min="1"
+                        step="1"
+                        defaultValue={o.quantity}
+                        className="text-gray-900 form-input border border-gray-300 w-16 rounded-sm focus:border-palette-light focus:ring-palette-light"
+                      />
+                    </td>
+                    <td className="font-primary text-base font-light px-4 sm:px-6 py-4 hidden sm:table-cell">
+                      <Price
+                        currency="$"
+                        num={o.price}
+                        numSize="text-lg"
+                      />
+                    </td>
+                    <td className="font-primary font-medium px-4 sm:px-6 py-4">
+                      <button
+                        aria-label="delete-item"
+                        className=""
+                      // onClick={() => updateItem(item.variantId, 0)}
+                      >
+                        <FontAwesomeIcon icon={faTimes} className="w-8 h-8 text-purple-700 border border-purple-700 p-1 hover:bg-palette-lighter" />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+
                 <tr className="text-center">
                   <td></td>
                   <td className="font-primary text-base text-gray-600 font-semibold uppercase px-4 sm:px-6 py-4">Subtotal</td>
                   <td className="font-primary text-lg text-purple-700 font-medium px-4 sm:px-6 py-4">
                     <Price
                       currency="$"
-                      num={200}
+                      num={total}
                       numSize="text-xl"
                     />
                   </td>
